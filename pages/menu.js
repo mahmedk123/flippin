@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Nav from '../src/components/Nav';
 
 const MenuPage = () => {
   const [menuItems, setMenuItems] = useState([]);
@@ -54,7 +55,7 @@ const MenuPage = () => {
   return (
     <div>
       <h1>Menu</h1>
-
+      <Nav />
       <form onSubmit={(e) => handleSubmit(e, newChickenBurger, setNewChickenBurger)}>
         <h2>Chicken Burgers</h2>
         <div>

@@ -8,13 +8,12 @@ const Nav = () => {
     <nav>
       <ul>
         <li>
-          <Link href="/index.js">Home</Link>
+          <Link href="/">Home</Link>
         </li>
         <li>
           <Link href="/about">About</Link>
         </li>
         <li>
-    
           <Link href="/menu">Menu</Link>
         </li>
         <li>
@@ -22,11 +21,11 @@ const Nav = () => {
         </li>
       </ul>
       {/* <SignedOut>
-            <SignInButton />
-          </SignedOut>
-          <SignedIn>
-            <UserButton />
-          </SignedIn> */}
+        <SignInButton />
+      </SignedOut>
+      <SignedIn>
+        <UserButton />
+      </SignedIn> */}
     </nav>
   );
 };
