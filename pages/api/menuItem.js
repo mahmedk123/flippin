@@ -4,9 +4,10 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { name, price } = req.body;
     if (!name || !price) {
-      return res.status(400).json({ error: 'Name and price are required' });
+      throw new Error('Failed to add {name}');
       
     }
+    
 
     res.setHeader('Access-Control-Allow-Origin', '*');
     try {
@@ -22,6 +23,22 @@ export default async function handler(req, res) {
     }
   } else {
     res.setHeader('Allow', ['POST']);
+   
+  }
+  if (req.method === 'GET') {
+    try {
+      const result = await sql`
+        SELECT * FROM test
+      `;
+      res.status(200).json(result.rows);
+    } catch (error) {
+      console.error('Error fetching menu items:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  } else if (req.method === 'POST') {
+    // Your existing code for handling POST requests
+  } else {
+    res.setHeader('Allow', ['GET', 'POST']);
     res.status(405).end('Method Not Allowed');
   }
 }

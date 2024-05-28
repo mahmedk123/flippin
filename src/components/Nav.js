@@ -1,5 +1,4 @@
-// src/components/Nav.js
-import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import React from 'react';
 
@@ -19,13 +18,17 @@ const Nav = () => {
         <li>
           <Link href="/contact">Contact</Link>
         </li>
+        <SignedOut>
+          <li>
+            <Link href="/signin">Sign In</Link>
+          </li>
+        </SignedOut>
+        <SignedIn>
+          <li>
+            <UserButton />
+          </li>
+        </SignedIn>
       </ul>
-      {/* <SignedOut>
-        <SignInButton />
-      </SignedOut>
-      <SignedIn>
-        <UserButton />
-      </SignedIn> */}
     </nav>
   );
 };
