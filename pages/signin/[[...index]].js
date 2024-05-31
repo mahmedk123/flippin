@@ -1,14 +1,17 @@
+// pages/signIn/[...index].js
+
 import { SignIn } from '@clerk/nextjs';
 import React from 'react';
 
 const SignInPage = () => {
   return (
-    <div>
-      <h1>Sign In</h1>
+    <div className="signInPageContainer">
+      <h1>Welcome Back!</h1>
+      <p>Please sign in to continue.</p>
       <SignIn 
-        path="/signin" // Update the path to "/signin"
-        routing="path" 
-        signUpUrl={null} 
+        path="/signIn" // Make sure this matches your directory structure
+        routing="path"
+        signUpUrl={null}
         appearance={{
           elements: {
             formFieldAction: 'hidden',
@@ -17,6 +20,25 @@ const SignInPage = () => {
           },
         }}
       />
+      <style jsx>{`
+        .signInPageContainer {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          background-color: black;
+          color: white;
+        }
+        h1 {
+          font-size: 2rem;
+          margin-bottom: 1rem;
+        }
+        p {
+          font-size: 1rem;
+          margin-bottom: 1rem;
+        }
+      `}</style>
     </div>
   );
 };

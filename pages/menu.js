@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Nav from '../src/components/Nav';
 import { useUser } from '@clerk/nextjs';
+import Layout from '../src/components/Layout';
 
 const categories = [
   { label: 'Chicken Burgers', type: 'chickenBurgers' },
@@ -74,8 +75,8 @@ const MenuPage = () => {
   };
 
   return (
-    <div>
-      <h1>Menu</h1>
+    <div className="menu-container">
+      <h1 className="menu-heading">Menu</h1>
       <Nav />
       {categories.map(({ label, type }) => (
         <div key={type}>
@@ -126,6 +127,14 @@ const MenuPage = () => {
           )}
         </div>
       ))}
+      <style jsx>{`
+        .menu-container {
+          text-align: center;
+        }
+        .menu-heading {
+          margin-bottom: 20px;
+        }
+      `}</style>
     </div>
   );
 };
