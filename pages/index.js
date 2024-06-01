@@ -14,6 +14,7 @@ export default function Home() {
       </Head>
       <main className="main">
         <Nav /> {/* Include Nav component */}
+        {/* <Header><p>10 ST HELENS ROAD BOLTON BL3 3NH</p></Header> */}
         <h1 className="logo">Flippin</h1>
         <p>Delicious food and great ambiance.</p>
       </main>
@@ -22,7 +23,7 @@ export default function Home() {
           font-family: 'Pacifico', cursive;
           font-size: 4em;
           margin: 20px 0;
-          color: #FF6347;
+          color: ##fff;
         }
         p {
           font-family: 'Roboto', sans-serif;

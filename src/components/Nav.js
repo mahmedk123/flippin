@@ -1,6 +1,7 @@
+// src/components/Nav.js
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Flex, Box, Button, VStack } from '@chakra-ui/react'; // Import Chakra UI components
+import { Flex, Box, Button, VStack } from '@chakra-ui/react';
 import {
   IconHome2,
   IconGauge,
@@ -11,7 +12,7 @@ import MyLogo from '../styles/flippin.jpeg';
 import { SignedIn, SignedOut, UserButton, useClerk } from '@clerk/nextjs';
 
 const Nav = () => {
-  const [active, setActive] = useState(0); // Set initial active index to 0
+  const [active, setActive] = useState(0);
   const { signOut } = useClerk();
 
   const mockdata = [
@@ -28,17 +29,17 @@ const Nav = () => {
         as={Link}
         href={link.href}
         key={link.label}
-        color="white" // Set text color to white
-        size="lg" // Increase button size
-        variant="outline" // Use outline variant
-        borderColor="transparent" // Make border transparent
-        textDecoration="none" // Remove underline
-        _hover={{ bg: 'orange.500' }} // Change background color to orange on hover
-        _active={{ bg: 'gray.800' }} // Change background color on click
+        color="white"
+        size="lg"
+        variant="outline"
+        borderColor="transparent"
+        textDecoration="none"
+        _hover={{ bg: 'orange.500' }}
+        _active={{ bg: 'gray.800' }}
         onClick={() => setActive(index)}
-        fontFamily="'Roboto', sans-serif" // Set font family
-        fontSize="1.2em" // Set font size
-        mt="1rem" // Add margin top for spacing
+        fontFamily="'Roboto', sans-serif"
+        fontSize="1.2em"
+        mt="1rem"
         leftIcon={<IconComponent />} // Include the icon component
       >
         {link.label}
@@ -52,14 +53,13 @@ const Nav = () => {
       width={{ base: 300 }}
       p="xs"
       bg="#000"
-      h="100vh" // Extend navbar to the end of the page
+      h="100vh"
       pos="fixed"
       top={0}
       left={0}
       justifyContent="space-between"
     >
       <Box>
-        {/* Replace MantineLogo with your own logo */}
         <img src={MyLogo} alt="Your Logo" style={{ width: '30px', height: '30px' }} />
         <VStack spacing="4" mt="4">
           {links}

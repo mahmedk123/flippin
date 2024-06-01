@@ -1,5 +1,4 @@
 // src/components/Layout.js
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
@@ -17,7 +16,7 @@ const Layout = ({ children }) => (
       body {
         margin: 0;
         padding: 0;
-        background: #000;
+        background: #000; /* Ensure this is set to black */
         color: #fff;
         font-family: 'Roboto', sans-serif;
         min-height: 100vh;

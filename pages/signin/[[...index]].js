@@ -9,9 +9,7 @@ const SignInPage = () => {
       <h1>Welcome Back!</h1>
       <p>Please sign in to continue.</p>
       <SignIn 
-        path="/signIn" // Make sure this matches your directory structure
-        routing="path"
-        signUpUrl={null}
+        
         appearance={{
           elements: {
             formFieldAction: 'hidden',
