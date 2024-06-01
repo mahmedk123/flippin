@@ -1,0 +1,18 @@
+/* styles/global.css */
+
+.hidden {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: black !important; /* Ensure background color is set to black */
+  color: #fff !important;
+  font-family: 'Roboto', sans-serif;
+}
+
+.header {
+  font-style: normal;
+  font-weight: 200;
+}
