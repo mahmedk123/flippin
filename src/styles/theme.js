@@ -8,9 +8,8 @@ const theme = extendTheme({
     },
   },
   fonts: {
-    // body: 'Roboto, sans-serif',
-    heading: 'ParalucentStencil ExtraLight, sans-serif', // Change the font for headings
-  
+    body: 'Roboto, sans-serif',
+    heading: 'Montserrat, sans-serif', // Add Montserrat for headings
   },
 });
 

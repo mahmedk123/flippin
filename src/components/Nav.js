@@ -8,7 +8,7 @@ import {
   IconDeviceDesktopAnalytics,
   IconCalendarStats,
 } from '@tabler/icons-react';
-import MyLogo from '../styles/flippin.jpeg';
+import MyLogo from '../styles/flippin.png';
 import { SignedIn, SignedOut, UserButton, useClerk } from '@clerk/nextjs';
 
 const Nav = () => {
@@ -60,7 +60,7 @@ const Nav = () => {
       justifyContent="space-between"
     >
       <Box>
-        <img src={MyLogo} alt="Your Logo" style={{ width: '30px', height: '30px' }} />
+        {/* <img src={MyLogo} alt="Your Logo" style={{ width: '30px', height: '30px' }} /> */}
         <VStack spacing="4" mt="4">
           {links}
         </VStack>

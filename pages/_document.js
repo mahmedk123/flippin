@@ -1,4 +1,3 @@
-// pages/_document.js
 import Document, { Html, Head, Main, NextScript } from 'next/document';
 
 class MyDocument extends Document {
@@ -11,17 +10,37 @@ class MyDocument extends Document {
     return (
       <Html>
         <Head>
-          {/* Add Adobe Fonts link */}
-          <link
-            rel="stylesheet"
-            href="https://use.typekit.net/pct7dxo.css"
-          />
-          {/* Add Google Fonts link */}
+          {/* Add Google Fonts */}
           <link
             href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
             rel="stylesheet"
           />
-          {/* Add any other stylesheet links here */}
+          <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+            rel="stylesheet"
+          />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Lobster&display=swap"
+            rel="stylesheet"
+          />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+            rel="stylesheet"
+          />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap"
+            rel="stylesheet"
+          />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Jacques+Francois+Shadow&display=swap"
+            rel="stylesheet"
+          />
+          {/* Add Font Awesome CDN */}
+          <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+            crossOrigin="anonymous"
+          />
         </Head>
         <body>
           <Main />
