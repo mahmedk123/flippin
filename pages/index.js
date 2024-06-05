@@ -31,15 +31,15 @@ export default function Home() {
                 <p className="chicken-shaq">BY THE CHICKEN SHAQ</p>
                 <img src="/milkshake.svg" alt="Milkshake Icon" className="milkshake-icon" />
               </div>
-              <div className="uber-eats-container">
+            </div>
+          </main>
+          {/* Footer */}
+          <div className="uber-eats-container">
                 <p>NOW AVAILABLE ON UBER EATS</p>
                 <a href="https://www.ubereats.com/gb/store/flippin-burgers-%26-shakes/xk_u5JpzReG7ddvZTTX0bQ" target="_blank" rel="noopener noreferrer" className="uber-eats-link">
                   <img src="/uber-eats.svg" alt="Uber Eats Icon" className="uber-eats-icon" />
                 </a>
               </div>
-            </div>
-          </main>
-          {/* Footer */}
           <footer className="footer">
             <div className="border-line"></div>
             <p>Telephone: 01204 665665</p>
@@ -96,7 +96,7 @@ export default function Home() {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          margin-top: 20px;
+          margin-top: 50px;
         }
         
         .icon-wrapper {

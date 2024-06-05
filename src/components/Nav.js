@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Flex, Box, Button, VStack } from '@chakra-ui/react';
+import { Flex, Box, Button, VStack, Center } from '@chakra-ui/react';
 import {
   IconHome2,
   IconBurger,
@@ -89,41 +89,12 @@ const Nav = () => {
             {links}
           </VStack>
         </Box>
-        <Box mb="4">
-          <SignedOut>
-            <Button
-              as={Link}
-              href="/signin"
-              color="white"
-              size="lg"
-              variant="solid"
-              bg="orange.500"
-              _hover={{ bg: 'orange.600' }}
-              fontFamily="'Roboto', sans-serif"
-              fontSize="1.2em"
-              mt="1rem"
-            >
-              Sign In
-            </Button>
-          </SignedOut>
-          <SignedIn>
-            <VStack spacing="4">
-              <UserButton
-                afterSignOutUrl="/"
-                appearance={{
-                  elements: {
-                    button: {
-                      size: 'lg',
-                      bg: 'orange.500',
-                      color: 'white',
-                      _hover: { bg: 'orange.600' },
-                      fontFamily: "'Roboto', sans-serif",
-                      fontSize: '1.2em',
-                    },
-                  },
-                }}
-              />
+        <Center mb="4"> {/* Center align the sign-in button */}
+          <Box>
+            <SignedOut>
               <Button
+                as={Link}
+                href="/signin"
                 color="white"
                 size="lg"
                 variant="solid"
@@ -132,13 +103,44 @@ const Nav = () => {
                 fontFamily="'Roboto', sans-serif"
                 fontSize="1.2em"
                 mt="1rem"
-                onClick={() => signOut()}
               >
-                Sign Out
+                Sign In
               </Button>
-            </VStack>
-          </SignedIn>
-        </Box>
+            </SignedOut>
+            <SignedIn>
+              <VStack spacing="4">
+                <UserButton
+                  afterSignOutUrl="/"
+                  appearance={{
+                    elements: {
+                      button: {
+                        size: 'lg',
+                        bg: 'orange.500',
+                        color: 'white',
+                        _hover: { bg: 'orange.600' },
+                        fontFamily: "'Roboto', sans-serif",
+                        fontSize: '1.2em',
+                      },
+                    },
+                  }}
+                />
+                <Button
+                  color="white"
+                  size="lg"
+                  variant="solid"
+                  bg="orange.500"
+                  _hover={{ bg: 'orange.600' }}
+                  fontFamily="'Roboto', sans-serif"
+                  fontSize="1.2em"
+                  mt="1rem"
+                  onClick={() => signOut()}
+                >
+                  Sign Out
+                </Button>
+              </VStack>
+            </SignedIn>
+          </Box>
+        </Center>
       </Flex>
     </>
   );
