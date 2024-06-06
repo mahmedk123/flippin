@@ -6,8 +6,11 @@ import {
   IconBurger,
   IconAddressBook,
 } from '@tabler/icons-react';
+import { SignedIn, SignedOut, UserButton, useClerk } from '@clerk/nextjs';
 
 const MobileNav = () => {
+  const { signOut } = useClerk();
+
   const mockdata = [
     { icon: IconHome2, label: 'Home', href: '/' },
     { icon: IconBurger, label: 'Menu', href: '/menu' },
@@ -56,6 +59,51 @@ const MobileNav = () => {
       <VStack spacing="4" mt="4">
         {links}
       </VStack>
+      <SignedIn>
+        <UserButton
+          afterSignOutUrl="/"
+          appearance={{
+            elements: {
+              button: {
+                size: 'lg',
+                bg: 'orange.500',
+                color: 'white',
+                _hover: { bg: 'orange.600' },
+                fontFamily: "'Roboto', sans-serif",
+                fontSize: '1.2em',
+              },
+            },
+          }}
+        />
+        <Button
+          color="white"
+          size="lg"
+          variant="solid"
+          bg="orange.500"
+          _hover={{ bg: 'orange.600' }}
+          fontFamily="'Roboto', sans-serif"
+          fontSize="1.2em"
+          mt="1rem"
+          onClick={() => signOut()}
+        >
+          Sign Out
+        </Button>
+      </SignedIn>
+      <SignedOut>
+        <Button
+          as={Link}
+          href="/signin"
+          color="white"
+          size="lg"
+          variant="solid"
+          bg="orange.500"
+          _hover={{ bg: 'orange.600' }}
+          fontFamily="'Roboto', sans-serif"
+          fontSize="1.2em"
+        >
+          Sign In
+        </Button>
+      </SignedOut>
     </Box>
   );
 };
