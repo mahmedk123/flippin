@@ -4,6 +4,7 @@ import { Flex, Box, Button, VStack, Center, useMediaQuery } from '@chakra-ui/rea
 import { IconHome2, IconBurger, IconAddressBook, IconMenu2 } from '@tabler/icons-react';
 import { SignedIn, SignedOut, UserButton, useClerk } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
+import MobileNav from './MobileNav';
 
 const Nav = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -16,7 +17,7 @@ const Nav = () => {
   };
 
   const handleMobileNavClick = () => {
-    router.push('/MobileNav');
+    router.push('components/MobileNav');
   };
 
   const mockdata = [
