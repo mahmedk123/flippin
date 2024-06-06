@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Flex, Box, Button, VStack, Center } from '@chakra-ui/react';
-import {
-  IconHome2,
-  IconBurger,
-  IconAddressBook,
-  IconMenu2,
-} from '@tabler/icons-react';
+import { IconHome2, IconBurger, IconAddressBook, IconMenu2 } from '@tabler/icons-react';
 import { SignedIn, SignedOut, UserButton, useClerk } from '@clerk/nextjs';
 
 const Nav = () => {
