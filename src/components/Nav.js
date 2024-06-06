@@ -17,7 +17,7 @@ const Nav = () => {
     setIsNavOpen(!isNavOpen);
     const content = document.querySelector('.content');
     if (content) {
-      content.classList.toggle('blur');
+      content.classList.toggle('nav-open');
     }
   };
 
@@ -79,7 +79,7 @@ const Nav = () => {
         transition="left 0.3s ease"
         justifyContent="space-between"
         className="nav"
-        zIndex={isNavOpen ? 1003 : 0} // Adjust z-index when nav is open
+        zIndex={isNavOpen ? 1003 : 0} // Ensure nav is above content when open
       >
         <Box>
           <VStack spacing="4" mt="4">
@@ -141,8 +141,12 @@ const Nav = () => {
       </Flex>
       <style jsx>{`
         // Add your custom styles here
-        .blur {
-          filter: blur(3px); /* Adjust the blur intensity as needed */
+        .content {
+          transition: transform 0.3s ease;
+        }
+
+        .content.nav-open {
+          transform: translateX(300px); // Adjust based on nav width
         }
       `}</style>
     </>
