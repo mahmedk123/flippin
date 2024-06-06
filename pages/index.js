@@ -65,7 +65,7 @@ export default function Home() {
           .footer {
             text-align: center;
             font-family: 'Montserrat', sans-serif; /* Use body font from theme */
-            font-size: 2em;
+            font-size: 0.5em;
             background-color: rgba(0, 0, 0, 0.5); /* Add a background color for better visibility */
             display: flex;
             flex-direction: column;
@@ -152,7 +152,7 @@ export default function Home() {
           
           .footer-text {
             font-family: 'Montserrat', sans-serif;
-            font-size: 1.5em;
+            font-size: 5em;
           }
 
           /* Media query for mobile screens */

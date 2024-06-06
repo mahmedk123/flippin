@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Flex, Box, Button, VStack, Center } from '@chakra-ui/react';
-import { IconHome2, IconBurger, IconAddressBook, IconMenu2 } from '@tabler/icons-react';
+import {
+  IconHome2,
+  IconBurger,
+  IconAddressBook,
+  IconMenu2,
+} from '@tabler/icons-react';
 import { SignedIn, SignedOut, UserButton, useClerk } from '@clerk/nextjs';
 
 const Nav = () => {
@@ -74,7 +79,7 @@ const Nav = () => {
         transition="left 0.3s ease"
         justifyContent="space-between"
         className="nav"
-        zIndex={1001}
+        zIndex={isNavOpen ? 1003 : 0} // Adjust z-index when nav is open
       >
         <Box>
           <VStack spacing="4" mt="4">
@@ -134,6 +139,12 @@ const Nav = () => {
           </Box>
         </Center>
       </Flex>
+      <style jsx>{`
+        // Add your custom styles here
+        .blur {
+          filter: blur(3px); /* Adjust the blur intensity as needed */
+        }
+      `}</style>
     </>
   );
 };
