@@ -47,7 +47,7 @@ const MobileNav = () => {
       top={0}
       left={0}
       zIndex={1003}
-      display={{ base: 'flex', md: 'none' }} // Show only on mobile
+      display={{ base: 'flex', md: 'none' }} 
       flexDirection="column"
       justifyContent="flex-start"
       alignItems="flex-start"
