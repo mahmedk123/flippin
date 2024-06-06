@@ -124,7 +124,7 @@ const MenuPage = () => {
   };
 
   return (
-    <Container maxW="container.xl">
+    <Container maxW="container.xl" position="relative" zIndex={1}>
       <Nav />
       <Heading as="h1" textAlign="center" my="8">
         Menu
@@ -148,31 +148,28 @@ const MenuPage = () => {
           <Collapse in={isOpen[type]}>
             <VStack spacing="4" align="start" mt="4">
               {(menuItems[type] || []).map((item, index) => (
-             <Box
-             key={index}
-             p="2"
-             borderWidth="3px"
-             borderRadius="xl"
-             w="50%" // Adjust the width as needed
-             margin="auto"
-             mt="4"
-             boxShadow="md"
-             textAlign="center" // Center align the content
-           >
-             <Text fontWeight="bold" fontSize="xl">
-               {item.foodname}
-             </Text>
-             <Box mt="2"> {/* Add margin to separate the description */}
-               <Text>{item.description}</Text>
-             </Box>
-             <Flex justifyContent="center" alignItems="center" mt="2"> {/* Use Flexbox to center align the content */}
-               <Text alignSelf="flex-start">{item.description ? "on its own" : ""}</Text>
-               <Box ml="2">£{item.foodprice}</Box> {/* Add margin to separate the price from the <p> */}
-             </Flex>
-           </Box>
-           
-            
-            
+                <Box
+                  key={index}
+                  p="2"
+                  borderWidth="3px"
+                  borderRadius="xl"
+                  w="50%"
+                  margin="auto"
+                  mt="4"
+                  boxShadow="md"
+                  textAlign="center"
+                >
+                  <Text fontWeight="bold" fontSize="xl">
+                    {item.foodname}
+                  </Text>
+                  <Box mt="2">
+                    <Text>{item.description}</Text>
+                  </Box>
+                  <Flex justifyContent="center" alignItems="center" mt="2">
+                    <Text alignSelf="flex-start">{item.description ? 'on its own' : ''}</Text>
+                    <Box ml="2">£{item.foodprice}</Box>
+                  </Flex>
+                </Box>
               ))}
             </VStack>
             {isSignedIn && (

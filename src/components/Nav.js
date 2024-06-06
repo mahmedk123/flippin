@@ -15,7 +15,6 @@ const Nav = () => {
 
   const toggleNav = () => {
     setIsNavOpen(!isNavOpen);
-
     const content = document.querySelector('.content');
     if (content) {
       content.classList.toggle('blur');
@@ -63,7 +62,7 @@ const Nav = () => {
         pos="fixed"
         top={0}
         left={0}
-        zIndex={1001}
+        zIndex={1002}
         m="1rem"
       >
         <IconMenu2 />
@@ -80,7 +79,7 @@ const Nav = () => {
         transition="left 0.3s ease"
         justifyContent="space-between"
         className="nav"
-        zIndex={1000}
+        zIndex={1001}
       >
         <Box>
           <VStack spacing="4" mt="4">
