@@ -176,6 +176,7 @@ export default function Home() {
               position: fixed; /* Position burger icon fixed for mobile */
               top: 10px; /* Adjust top position as needed */
               left: 10px; /* Adjust left position as needed */
+              z-index: 1001; /* Ensure burger icon is above other elements */
             }
 
             .uber-eats-container {
