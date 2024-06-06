@@ -5,18 +5,17 @@ import {
   IconHome2,
   IconBurger,
   IconAddressBook,
-  IconMenu2, // Import the burger icon
+  IconMenu2,
 } from '@tabler/icons-react';
 import { SignedIn, SignedOut, UserButton, useClerk } from '@clerk/nextjs';
 
 const Nav = () => {
-  const [isNavOpen, setIsNavOpen] = useState(false); // State to track if nav is open
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const { signOut } = useClerk();
 
   const toggleNav = () => {
-    setIsNavOpen(!isNavOpen); // Toggle the state of the nav
-    
-    // Add or remove blur class from content element
+    setIsNavOpen(!isNavOpen);
+
     const content = document.querySelector('.content');
     if (content) {
       content.classList.toggle('blur');
@@ -29,7 +28,7 @@ const Nav = () => {
     { icon: IconAddressBook, label: 'Contact', href: '/contact' },
   ];
 
-  const links = mockdata.map((link, index) => {
+  const links = mockdata.map((link) => {
     const IconComponent = link.icon;
     return (
       <Button
@@ -46,7 +45,7 @@ const Nav = () => {
         fontFamily="'Roboto', sans-serif"
         fontSize="1.2em"
         mt="1rem"
-        leftIcon={<IconComponent />} // Include the icon component
+        leftIcon={<IconComponent />}
       >
         {link.label}
       </Button>
@@ -55,7 +54,6 @@ const Nav = () => {
 
   return (
     <>
-      {/* Burger icon */}
       <Button
         className="burger-icon"
         onClick={toggleNav}
@@ -65,7 +63,7 @@ const Nav = () => {
         pos="fixed"
         top={0}
         left={0}
-        zIndex={999}
+        zIndex={1001}
         m="1rem"
       >
         <IconMenu2 />
@@ -78,18 +76,18 @@ const Nav = () => {
         h="100vh"
         pos="fixed"
         top={0}
-        left={isNavOpen ? 0 : '-300px'} // Slide the nav off-screen when closed
-        transition="left 0.3s ease" // Add transition for smooth animation
+        left={isNavOpen ? 0 : '-300px'}
+        transition="left 0.3s ease"
         justifyContent="space-between"
         className="nav"
-        zIndex={998} // Ensure the nav is behind the burger icon
+        zIndex={1000}
       >
         <Box>
           <VStack spacing="4" mt="4">
             {links}
           </VStack>
         </Box>
-        <Center mb="4"> {/* Center align the sign-in button */}
+        <Center mb="4">
           <Box>
             <SignedOut>
               <Button

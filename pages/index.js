@@ -138,7 +138,7 @@ export default function Home() {
             justify-content: center;
             margin-top: 20px; /* Adjust margin as needed */
             font-family: 'Montserrat', sans-serif;
-            font-size: 2.5m;
+            font-size: 2.5em;
           }
           
           .uber-eats-link {
@@ -150,24 +150,52 @@ export default function Home() {
             height: 6em;
           }
           
+          .footer-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5em;
+          }
+
           /* Media query for mobile screens */
           @media (max-width: 768px) {
+            .header h1 {
+              font-size: 1.5em; /* Adjust header font size for smaller screens */
+            }
+
             .logotest {
               height: 12em; /* Adjust height for smaller screens */
             }
-            
+
             .icons {
               flex-direction: row; /* Change flex-direction to row for smaller screens */
             }
-            
+
             .icon-wrapper {
               margin-top: 0; /* Remove top margin for smaller screens */
             }
-            
+
             .burger-icon {
               position: fixed; /* Position burger icon fixed for mobile */
               top: 10px; /* Adjust top position as needed */
               left: 10px; /* Adjust left position as needed */
+            }
+
+            .uber-eats-container {
+              flex-direction: column;
+              text-align: center;
+              font-size: 1.5em; /* Adjust font size for smaller screens */
+            }
+
+            .uber-eats-icon {
+              height: 4em; /* Adjust height for smaller screens */
+              margin-top: 10px;
+            }
+
+            .footer-text {
+              font-size: 1em; /* Adjust footer text size for smaller screens */
+            }
+
+            .border-line {
+              width: 90%; /* Adjust border line width for smaller screens */
             }
           }
 
