@@ -61,16 +61,15 @@ const Nav = () => {
         color="white"
         size="lg"
         pos="fixed"
-        top={0}
-        left={0}
-        zIndex={1001}
-        m="1rem"
+        top="1rem"
+        left="1rem"
+        zIndex={1100}
       >
         <IconMenu2 />
       </Button>
       <Flex
         direction="column"
-        width={{ base: 300 }}
+        width="300px"
         p="xs"
         bg="#000"
         h="100vh"
@@ -80,7 +79,7 @@ const Nav = () => {
         transition="left 0.3s ease"
         justifyContent="space-between"
         className="nav"
-        zIndex={1000}
+        zIndex={1099}
       >
         <Box>
           <VStack spacing="4" mt="4">

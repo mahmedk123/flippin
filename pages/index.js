@@ -15,11 +15,11 @@ export default function Home() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <div className="content">
-          <Nav />
           <header className="header">
             <h1>10 ST HELENS ROAD BOLTON BL3 3NH</h1>
             <div className="border-line"></div>
           </header>
+          <Nav />
           <main className="main">
             <div className="logotest-container">
               <Image src="/flippin-white.svg" alt="Flippin Logo" className="logotest" />
@@ -33,7 +33,6 @@ export default function Home() {
               </div>
             </div>
           </main>
-          {/* Footer */}
           <footer className="footer">
             <div className="footer-content">
               <div className="uber-eats-container">
@@ -196,6 +195,10 @@ export default function Home() {
 
             .border-line {
               width: 90%; /* Adjust border line width for smaller screens */
+            }
+
+            .uber-eats-container p {
+              font-size: 1em; /* Adjust 'NOW AVAILABLE ON UBER EATS' font size for mobile */
             }
           }
 
