@@ -1,24 +1,22 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Flex, Box, Button, VStack, Center } from '@chakra-ui/react';
-import {
-  IconHome2,
-  IconBurger,
-  IconAddressBook,
-  IconMenu2,
-} from '@tabler/icons-react';
+import { Flex, Box, Button, VStack, Center, useMediaQuery } from '@chakra-ui/react';
+import { IconHome2, IconBurger, IconAddressBook, IconMenu2 } from '@tabler/icons-react';
 import { SignedIn, SignedOut, UserButton, useClerk } from '@clerk/nextjs';
+import { useRouter } from 'next/router';
 
 const Nav = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const { signOut } = useClerk();
+  const [isMobile] = useMediaQuery("(max-width: 768px)");
+  const router = useRouter();
 
   const toggleNav = () => {
     setIsNavOpen(!isNavOpen);
-    const content = document.querySelector('.content');
-    if (content) {
-      content.classList.toggle('nav-open');
-    }
+  };
+
+  const handleMobileNavClick = () => {
+    router.push('/MobileNav');
   };
 
   const mockdata = [
@@ -51,22 +49,26 @@ const Nav = () => {
     );
   });
 
+  const navIcon = (
+    <Button
+      className="burger-icon"
+      onClick={isMobile ? handleMobileNavClick : toggleNav}
+      variant="unstyled"
+      color="white"
+      size="lg"
+      pos="fixed"
+      top={0}
+      left={0}
+      zIndex={1002}
+      m="1rem"
+    >
+      <IconMenu2 />
+    </Button>
+  );
+
   return (
     <>
-      <Button
-        className="burger-icon"
-        onClick={toggleNav}
-        variant="unstyled"
-        color="white"
-        size="lg"
-        pos="fixed"
-        top={0}
-        left={0}
-        zIndex={1002}
-        m="1rem"
-      >
-        <IconMenu2 />
-      </Button>
+      {navIcon}
       <Flex
         direction="column"
         width={{ base: 300 }}
@@ -139,16 +141,6 @@ const Nav = () => {
           </Box>
         </Center>
       </Flex>
-      <style jsx>{`
-        // Add your custom styles here
-        .content {
-          transition: transform 0.3s ease;
-        }
-
-        .content.nav-open {
-          transform: translateX(300px); // Adjust based on nav width
-        }
-      `}</style>
     </>
   );
 };
