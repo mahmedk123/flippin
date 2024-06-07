@@ -197,7 +197,7 @@ const MenuPage = ({ initialMenuItems }) => {
         p="4"
         textAlign="center"
         borderTop="2px"
-        borderColor="orange.500"
+        borderColor="black"
         color="white"
       >
         <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold">
