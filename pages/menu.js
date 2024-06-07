@@ -37,7 +37,7 @@ export async function getStaticProps() {
       if (!res.ok) {
         throw new Error(`Failed to fetch menu data for ${type}`);
       }
-       const data = await res.json();
+      const data = await res.json();
       console.log('Response JSON:', data); // Log the response JSON
       return data;
      
@@ -169,8 +169,7 @@ const MenuPage = ({ initialMenuItems }) => {
       {categories.map(({ label, type }) => (
         <Box key={type} my="8">
           <Flex
-            justify="space-between"
-            align="center"
+            direction="column"
             borderBottom="2px"
             borderColor="orange.500"
             pb="2"
@@ -190,8 +189,7 @@ const MenuPage = ({ initialMenuItems }) => {
                   p="2"
                   borderWidth="3px"
                   borderRadius="xl"
-                  w="50%"
-                  margin="auto"
+                  w="full"
                   mt="4"
                   boxShadow="md"
                   textAlign="center"
