@@ -70,6 +70,12 @@ const MenuPage = ({ initialMenuItems }) => {
       return acc;
     }, {})
   );
+  const [fetchStatus, setFetchStatus] = useState(
+    categories.reduce((acc, category) => {
+      acc[category.type] = initialMenuItems[category.type].length > 0;
+      return acc;
+    }, {})
+  );
 
   const { isSignedIn } = useUser();
 
@@ -88,19 +94,23 @@ const MenuPage = ({ initialMenuItems }) => {
       }
       const data = await res.json();
       setMenuItemsCache((prev) => ({ ...prev, [type]: data }));
+      if (data.length === 0) {
+        setFetchStatus((prev) => ({ ...prev, [type]: false }));
+      }
     } catch (error) {
       console.error(`Error fetching menu data for ${type}:`, error);
       setMenuItemsCache((prev) => ({ ...prev, [type]: [] }));
+      setFetchStatus((prev) => ({ ...prev, [type]: false }));
     }
   };
 
   useEffect(() => {
     categories.forEach(({ type }) => {
-      if (!menuItemsCache[type].length) {
+      if (menuItemsCache[type].length === 0 && fetchStatus[type]) {
         fetchMenuData(type);
       }
     });
-  }, [menuItemsCache]);
+  }, [menuItemsCache, fetchStatus]);
 
   return (
     <Container maxW="container.xl" minH="100vh" position="relative" pb="40px">
@@ -109,7 +119,7 @@ const MenuPage = ({ initialMenuItems }) => {
         Menu
       </Heading>
       {categories.map(({ label, type }) => (
-        <Box key={type} my="12"> {/* Adjusted margin to spread out labels */}
+        <Box key={type} my="12">
           <Flex
             justify="space-between"
             align="center"
@@ -132,7 +142,7 @@ const MenuPage = ({ initialMenuItems }) => {
                   p="2"
                   borderWidth="3px"
                   borderRadius="xl"
-                  w={{ base: '100%', md: '75%', lg: '50%' }} /* Ensure width is responsive */
+                  w={{ base: '100%', md: '75%', lg: '50%' }}
                   margin="auto"
                   mt="4"
                   boxShadow="md"
@@ -197,7 +207,7 @@ const MenuPage = ({ initialMenuItems }) => {
         p="4"
         textAlign="center"
         borderTop="2px"
-        borderColor="black"
+        borderColor="orange.500"
         color="white"
       >
         <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold">
