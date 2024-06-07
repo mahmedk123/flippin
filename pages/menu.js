@@ -37,7 +37,10 @@ export async function getStaticProps() {
       if (!res.ok) {
         throw new Error(`Failed to fetch menu data for ${type}`);
       }
-      return await res.json();
+       const data = await res.json();
+      console.log('Response JSON:', data); // Log the response JSON
+      return data;
+     
     } catch (error) {
       console.error(`Error fetching menu data for ${type}:`, error);
       return [];
@@ -63,6 +66,7 @@ export async function getStaticProps() {
 }
 
 const MenuPage = ({ initialMenuItems }) => {
+  console.log(initialMenuItems)
   const [menuItems, setMenuItems] = useState(initialMenuItems);
   const [newItems, setNewItems] = useState(
     categories.reduce((acc, category) => {
