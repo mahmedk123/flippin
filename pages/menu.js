@@ -15,7 +15,6 @@ import {
   VStack,
   Icon,
   Text,
-  Center,
 } from '@chakra-ui/react';
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 
@@ -161,15 +160,16 @@ const MenuPage = ({ initialMenuItems }) => {
   };
 
   return (
-    <Container maxW="container.xl" position="relative" zIndex={1}>
+    <Container maxW="container.xl">
       <Nav />
       <Heading as="h1" textAlign="center" my="8">
         Menu
       </Heading>
       {categories.map(({ label, type }) => (
-        <Box key={type} my="8">
+        <Box key={type} my="4">
           <Flex
-            direction="column"
+            justify="space-between"
+            align="center"
             borderBottom="2px"
             borderColor="orange.500"
             pb="2"
@@ -182,7 +182,7 @@ const MenuPage = ({ initialMenuItems }) => {
             <Icon as={isOpen[type] ? ChevronUpIcon : ChevronDownIcon} w={6} h={6} />
           </Flex>
           <Collapse in={isOpen[type]}>
-            <VStack spacing="4" align="start" mt="4">
+            <VStack spacing="4" align="start" mt="2">
               {(menuItems[type] || []).map((item, index) => (
                 <Box
                   key={index}
@@ -190,7 +190,6 @@ const MenuPage = ({ initialMenuItems }) => {
                   borderWidth="3px"
                   borderRadius="xl"
                   w="full"
-                  mt="4"
                   boxShadow="md"
                   textAlign="center"
                 >
