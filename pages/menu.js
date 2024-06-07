@@ -29,8 +29,40 @@ const categories = [
   { label: 'Hot Dogs', type: 'hotdogs' },
 ];
 
-const MenuPage = () => {
-  const [menuItems, setMenuItems] = useState({});
+export async function getStaticProps() {
+  const fetchMenuData = async (type) => {
+    try {
+      const res = await fetch(`/api/menuItem?type=${type}`);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch menu data for ${type}`);
+      }
+      return await res.json();
+    } catch (error) {
+      console.error(`Error fetching menu data for ${type}:`, error);
+      return [];
+    }
+  };
+
+  const menuItems = {};
+  for (const category of categories) {
+    try {
+      menuItems[category.type] = await fetchMenuData(category.type);
+    } catch (error) {
+      console.error(`Error fetching data for category ${category.type}:`, error);
+      menuItems[category.type] = [];
+    }
+  }
+
+  return {
+    props: {
+      initialMenuItems: menuItems,
+    },
+    revalidate: 10, // If you want to enable Incremental Static Regeneration
+  };
+}
+
+const MenuPage = ({ initialMenuItems }) => {
+  const [menuItems, setMenuItems] = useState(initialMenuItems);
   const [newItems, setNewItems] = useState(
     categories.reduce((acc, category) => {
       acc[category.type] = { name: '', price: '', description: '', type: category.type };
