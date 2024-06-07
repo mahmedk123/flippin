@@ -37,9 +37,7 @@ export async function getStaticProps() {
         throw new Error(`Failed to fetch menu data for ${type}`);
       }
       const data = await res.json();
-      console.log('Response JSON:', data); // Log the response JSON
       return data;
-     
     } catch (error) {
       console.error(`Error fetching menu data for ${type}:`, error);
       return [];
@@ -65,92 +63,15 @@ export async function getStaticProps() {
 }
 
 const MenuPage = ({ initialMenuItems }) => {
-  console.log(initialMenuItems)
-  const [menuItems, setMenuItems] = useState(initialMenuItems);
-  const [newItems, setNewItems] = useState(
-    categories.reduce((acc, category) => {
-      acc[category.type] = { name: '', price: '', description: '', type: category.type };
-      return acc;
-    }, {})
-  );
+  const [menuItemsCache, setMenuItemsCache] = useState(initialMenuItems);
   const [isOpen, setIsOpen] = useState(
     categories.reduce((acc, category) => {
       acc[category.type] = false;
       return acc;
     }, {})
   );
-  const [errors, setErrors] = useState(
-    categories.reduce((acc, category) => {
-      acc[category.type] = '';
-      return acc;
-    }, {})
-  );
+
   const { isSignedIn } = useUser();
-
-  useEffect(() => {
-    categories.forEach(({ type }) => fetchMenuData(type));
-  }, []);
-
-  const fetchMenuData = async (type) => {
-    try {
-      const res = await fetch(`/api/menuItem?type=${type}`);
-      if (!res.ok) {
-        throw new Error('Failed to fetch menu data');
-      }
-      const data = await res.json();
-      setMenuItems((prev) => ({ ...prev, [type]: data }));
-    } catch (error) {
-      console.error(`Error fetching menu data for ${type}:`, error);
-      setMenuItems((prev) => ({ ...prev, [type]: [] }));
-    }
-  };
-
-  const handleInputChange = (e, type) => {
-    const { name, value } = e.target;
-    setNewItems((prev) => ({
-      ...prev,
-      [type]: { ...prev[type], [name]: value },
-    }));
-  };
-
-  const handleSubmit = async (e, type) => {
-    e.preventDefault();
-    const newItem = newItems[type];
-
-    // Validate description length
-    if (newItem.description.length < 50) {
-      setErrors((prev) => ({
-        ...prev,
-        [type]: 'Description must be at least 50 characters long.',
-      }));
-      return;
-    }
-
-    try {
-      console.log('Submitting new item:', newItem); // Add logging here
-      const res = await fetch('/api/menuItem', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newItem),
-      });
-      if (!res.ok) {
-        throw new Error(`Failed to add ${type}`);
-      }
-      fetchMenuData(type);
-      setNewItems((prev) => ({
-        ...prev,
-        [type]: { name: '', price: '', description: '', type },
-      }));
-      setErrors((prev) => ({
-        ...prev,
-        [type]: '',
-      }));
-    } catch (error) {
-      console.error(`Error adding ${type}:`, error);
-    }
-  };
 
   const toggleCollapse = (type) => {
     setIsOpen((prev) => ({
@@ -159,6 +80,28 @@ const MenuPage = ({ initialMenuItems }) => {
     }));
   };
 
+  const fetchMenuData = async (type) => {
+    try {
+      const res = await fetch(`/api/menuItem?type=${type}`);
+      if (!res.ok) {
+        throw new Error('Failed to fetch menu data');
+      }
+      const data = await res.json();
+      setMenuItemsCache((prev) => ({ ...prev, [type]: data }));
+    } catch (error) {
+      console.error(`Error fetching menu data for ${type}:`, error);
+      setMenuItemsCache((prev) => ({ ...prev, [type]: [] }));
+    }
+  };
+
+  useEffect(() => {
+    categories.forEach(({ type }) => {
+      if (!menuItemsCache[type].length) {
+        fetchMenuData(type);
+      }
+    });
+  }, [menuItemsCache]);
+
   return (
     <Container maxW="container.xl">
       <Nav />
@@ -166,7 +109,7 @@ const MenuPage = ({ initialMenuItems }) => {
         Menu
       </Heading>
       {categories.map(({ label, type }) => (
-        <Box key={type} my="4">
+        <Box key={type} my="8">
           <Flex
             justify="space-between"
             align="center"
@@ -182,14 +125,16 @@ const MenuPage = ({ initialMenuItems }) => {
             <Icon as={isOpen[type] ? ChevronUpIcon : ChevronDownIcon} w={6} h={6} />
           </Flex>
           <Collapse in={isOpen[type]}>
-            <VStack spacing="4" align="start" mt="2">
-              {(menuItems[type] || []).map((item, index) => (
+            <VStack spacing="4" align="start" mt="4">
+              {(menuItemsCache[type] || []).map((item, index) => (
                 <Box
                   key={index}
                   p="2"
                   borderWidth="3px"
                   borderRadius="xl"
-                  w="full"
+                  w="50%"
+                  margin="auto"
+                  mt="4"
                   boxShadow="md"
                   textAlign="center"
                 >
@@ -207,14 +152,12 @@ const MenuPage = ({ initialMenuItems }) => {
               ))}
             </VStack>
             {isSignedIn && (
-              <Box as="form" onSubmit={(e) => handleSubmit(e, type)} mt="4">
+              <Box as="form" onSubmit={(e) => e.preventDefault()} mt="4">
                 <FormControl mb="4">
                   <FormLabel>Name:</FormLabel>
                   <Input
                     type="text"
                     name="name"
-                    value={newItems[type].name}
-                    onChange={(e) => handleInputChange(e, type)}
                     placeholder="Enter item name"
                     required
                   />
@@ -224,8 +167,6 @@ const MenuPage = ({ initialMenuItems }) => {
                   <Input
                     type="text"
                     name="price"
-                    value={newItems[type].price}
-                    onChange={(e) => handleInputChange(e, type)}
                     placeholder="Enter item price"
                     required
                   />
@@ -234,13 +175,10 @@ const MenuPage = ({ initialMenuItems }) => {
                   <FormLabel>Description:</FormLabel>
                   <Textarea
                     name="description"
-                    value={newItems[type].description}
-                    onChange={(e) => handleInputChange(e, type)}
                     placeholder="Enter item description"
                     required
                   />
                 </FormControl>
-                {errors[type] && <Text color="red.500">{errors[type]}</Text>}
                 <Button type="submit" colorScheme="orange">
                   Add {label}
                 </Button>
