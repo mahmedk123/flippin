@@ -152,7 +152,7 @@ const MenuPage = ({ initialMenuItems }) => {
               ))}
             </VStack>
             {isSignedIn && (
-              <Box as="form" onSubmit={(e) => e.preventDefault()} mt="4">
+              <Box as="form" mt="4">
                 <FormControl mb="4">
                   <FormLabel>Name:</FormLabel>
                   <Input
