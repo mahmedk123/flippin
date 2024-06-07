@@ -1,0 +1,45 @@
+/* styles/global.css */
+
+.hidden {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: black !important; /* Ensure background color is set to black */
+  color: #fff !important;
+  font-family: 'Roboto', sans-serif;
+}
+
+.header {
+  font-style: normal;
+  font-weight: 200;
+}
+/* styles/globals.css or in a CSS-in-JS solution */
+@media (max-width: 768px) {
+  .burger-icon {
+    display: block;
+  }
+
+  .nav {
+    /* Define styles for the nav container */
+    width: 300px;
+    padding: 4px;
+    background: #000;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s ease; /* Add transition for smooth animation */
+    transform: translateX(-100%); /* Initially move the nav off-screen */
+  }
+  
+  .nav.open {
+    /* Define styles when nav is open */
+    transform: translateX(0); /* Move the nav to the visible position */
+  }
+}
