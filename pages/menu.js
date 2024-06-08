@@ -71,6 +71,9 @@ const MenuPage = ({ initialMenuItems }) => {
   const [formData, setFormData] = useState({ name: '', price: '', description: '' });
 
   const handleDelete = async (type, name) => {
+    // Encode the name before passing it to the API call
+    const encodedName = encodeURIComponent(name);
+  
     // Show confirmation dialog
     const isConfirmed = window.confirm('Are you sure you want to delete this item?');
     if (!isConfirmed) {
@@ -78,21 +81,31 @@ const MenuPage = ({ initialMenuItems }) => {
     }
   
     try {
-      const res = await fetch(`/api/menuItem?type=${type}&name=${name}`, {
+      const res = await fetch(`/api/menuItem?type=${type}&name=${encodedName}`, {
         method: 'DELETE',
       });
       if (!res.ok) {
         throw new Error('Failed to delete menu item');
       }
+  
+      console.log('Menu item deleted successfully');
+  
       // Remove the deleted menu item from state
-      setMenuItemsCache((prev) => ({
-        ...prev,
-        [type]: prev[type].filter(item => item.foodname !== name),
-      }));
+      setMenuItemsCache((prev) => {
+        // Filter out the item with the matching name
+        const filteredItems = prev[type].filter(item => item.foodname !== name);
+  
+        // Return the updated state with filtered items
+        return {
+          ...prev,
+          [type]: filteredItems,
+        };
+      });
     } catch (error) {
       console.error('Error deleting menu item:', error);
     }
   };
+  
 
   const fetchMenuData = async (type) => {
     try {
