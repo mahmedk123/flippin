@@ -71,6 +71,12 @@ const MenuPage = ({ initialMenuItems }) => {
   const [formData, setFormData] = useState({ name: '', price: '', description: '' });
 
   const handleDelete = async (type, name) => {
+    // Show confirmation dialog
+    const isConfirmed = window.confirm('Are you sure you want to delete this item?');
+    if (!isConfirmed) {
+      return; // If user cancels, do nothing
+    }
+  
     try {
       const res = await fetch(`/api/menuItem?type=${type}&name=${name}`, {
         method: 'DELETE',
