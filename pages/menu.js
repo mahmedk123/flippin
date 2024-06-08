@@ -168,7 +168,7 @@ const MenuPage = ({ initialMenuItems }) => {
             cursor="pointer"
             onClick={() => toggleCollapse(type)}
             direction={{ base: 'column', md: 'row' }} // Adjust direction based on screen size
-            transition="all 0.3s" // Add transition animation
+            transition={`all 0.3s ${isOpen[type] ? '' : 'ease-in-out'}`} // Adjust easing based on collapse state
             bg={selectedLabel === type ? 'orange.100' : 'transparent'} // Add selected label effect
           >
             <Heading as="h2" size="lg" mb={{ base: '4', md: '0' }}> {/* Adjust margin bottom based on screen size */}
@@ -255,7 +255,7 @@ const MenuPage = ({ initialMenuItems }) => {
         p="4"
         textAlign="center"
         borderTop="2px"
-        borderColor="orange.500"
+        borderColor="black"
         color="white"
       >
         <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold">
