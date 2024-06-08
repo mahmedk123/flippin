@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   Container,
-  Collapse,
   Flex,
   FormControl,
   FormLabel,
@@ -15,9 +14,9 @@ import {
   VStack,
   Icon,
   Text,
-  Center,
+  HStack,
+  useBreakpointValue,
 } from '@chakra-ui/react';
-import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 
 const categories = [
   { label: 'Smash Burgers', type: 'smashburgers' },
@@ -37,17 +36,21 @@ export async function getStaticProps() {
       if (!res.ok) {
         throw new Error(`Failed to fetch menu data for ${type}`);
       }
-      return await res.json();
+      const data = await res.json();
+      return data.length > 0 ? data : null; // Return null if no data
     } catch (error) {
       console.error(`Error fetching menu data for ${type}:`, error);
-      return [];
+      return null; // Return null in case of error
     }
   };
 
   const menuItems = {};
   for (const category of categories) {
     try {
-      menuItems[category.type] = await fetchMenuData(category.type);
+      const data = await fetchMenuData(category.type);
+      if (data) {
+        menuItems[category.type] = data;
+      }
     } catch (error) {
       console.error(`Error fetching data for category ${category.type}:`, error);
       menuItems[category.type] = [];
@@ -58,35 +61,51 @@ export async function getStaticProps() {
     props: {
       initialMenuItems: menuItems,
     },
-    revalidate: 10, // If you want to enable Incremental Static Regeneration
+    revalidate: 10, // Enable Incremental Static Regeneration
   };
 }
 
 const MenuPage = ({ initialMenuItems }) => {
-  const [menuItems, setMenuItems] = useState(initialMenuItems);
-  const [newItems, setNewItems] = useState(
-    categories.reduce((acc, category) => {
-      acc[category.type] = { name: '', price: '', description: '', type: category.type };
-      return acc;
-    }, {})
-  );
-  const [isOpen, setIsOpen] = useState(
-    categories.reduce((acc, category) => {
-      acc[category.type] = false;
-      return acc;
-    }, {})
-  );
-  const [errors, setErrors] = useState(
-    categories.reduce((acc, category) => {
-      acc[category.type] = '';
-      return acc;
-    }, {})
-  );
+  const [menuItemsCache, setMenuItemsCache] = useState(initialMenuItems);
   const { isSignedIn } = useUser();
+  const [formData, setFormData] = useState({ name: '', price: '', description: '' });
 
-  useEffect(() => {
-    categories.forEach(({ type }) => fetchMenuData(type));
-  }, []);
+  const handleDelete = async (type, name) => {
+    // Encode the name before passing it to the API call
+    const encodedName = encodeURIComponent(name);
+  
+    // Show confirmation dialog
+    const isConfirmed = window.confirm('Are you sure you want to delete this item?');
+    if (!isConfirmed) {
+      return; // If user cancels, do nothing
+    }
+  
+    try {
+      const res = await fetch(`/api/menuItem?type=${type}&name=${encodedName}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) {
+        throw new Error('Failed to delete menu item');
+      }
+  
+      console.log('Menu item deleted successfully');
+  
+      // Remove the deleted menu item from state
+      setMenuItemsCache((prev) => {
+        // Filter out the item with the matching name
+        const filteredItems = prev[type].filter(item => item.foodname !== name);
+  
+        // Return the updated state with filtered items
+        return {
+          ...prev,
+          [type]: filteredItems,
+        };
+      });
+    } catch (error) {
+      console.error('Error deleting menu item:', error);
+    }
+  };
+  
 
   const fetchMenuData = async (type) => {
     try {
@@ -95,159 +114,190 @@ const MenuPage = ({ initialMenuItems }) => {
         throw new Error('Failed to fetch menu data');
       }
       const data = await res.json();
-      setMenuItems((prev) => ({ ...prev, [type]: data }));
+      if (data.length > 0) {
+        setMenuItemsCache((prev) => ({ ...prev, [type]: data }));
+      }
     } catch (error) {
       console.error(`Error fetching menu data for ${type}:`, error);
-      setMenuItems((prev) => ({ ...prev, [type]: [] }));
+      setMenuItemsCache((prev) => ({ ...prev, [type]: [] }));
     }
   };
 
-  const handleInputChange = (e, type) => {
-    const { name, value } = e.target;
-    setNewItems((prev) => ({
-      ...prev,
-      [type]: { ...prev[type], [name]: value },
-    }));
-  };
+  useEffect(() => {
+    categories.forEach(({ type }) => {
+      if (!menuItemsCache[type] || menuItemsCache[type].length === 0) {
+        fetchMenuData(type);
+      }
+    });
+  }, [menuItemsCache]);
 
   const handleSubmit = async (e, type) => {
     e.preventDefault();
-    const newItem = newItems[type];
-
-    // Validate description length
-    if (newItem.description.length < 50) {
-      setErrors((prev) => ({
-        ...prev,
-        [type]: 'Description must be at least 50 characters long.',
-      }));
-      return;
-    }
-
+    const newItem = {
+      name: formData.name,
+      price: formData.price,
+      description: formData.description,
+    };
     try {
-      console.log('Submitting new item:', newItem); // Add logging here
-      const res = await fetch('/api/menuItem', {
+      const res = await fetch(`/api/menuItem?type=${type}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(newItem),
       });
+  
       if (!res.ok) {
-        throw new Error(`Failed to add ${type}`);
+        throw new Error(`Failed to add new menu item: ${res.statusText}`);
       }
-      fetchMenuData(type);
-      setNewItems((prev) => ({
+  
+      const responseData = await res.json();
+  
+      setMenuItemsCache((prev) => ({
         ...prev,
-        [type]: { name: '', price: '', description: '', type },
+        [type]: [...(prev[type] || []), responseData], // Ensure prev[type] is iterable
       }));
-      setErrors((prev) => ({
-        ...prev,
-        [type]: '',
-      }));
+      setFormData({ name: '', price: '', description: '' });
     } catch (error) {
-      console.error(`Error adding ${type}:`, error);
+      console.error('Error adding new menu item:', error);
     }
   };
 
-  const toggleCollapse = (type) => {
-    setIsOpen((prev) => ({
-      ...prev,
-      [type]: !prev[type],
-    }));
-  };
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
-    <Container maxW="container.xl" position="relative" zIndex={1}>
+    <Container maxW="container.xl" minH="100vh" position="relative" pb="40px">
       <Nav />
       <Heading as="h1" textAlign="center" my="8">
         Menu
       </Heading>
-      {categories.map(({ label, type }) => (
-        <Box key={type} my="8">
-          <Flex
-            justify="space-between"
-            align="center"
-            borderBottom="2px"
-            borderColor="orange.500"
-            pb="2"
-            cursor="pointer"
-            onClick={() => toggleCollapse(type)}
+      <HStack
+        overflowX="auto"
+        spacing={4}
+        pb={4}
+        mb={4}
+        borderBottom="2px"
+        borderColor="orange.500"
+        position="sticky" // Make the buttons sticky
+        top="0"
+        bg="white" // Ensure background color for better visibility
+        zIndex="10" // Ensure the buttons are above other content
+        css={{
+          '&::-webkit-scrollbar': { display: 'none' },
+          msOverflowStyle: 'none',
+          scrollbarWidth: 'none',
+        }}
+      >
+        {/* Render category buttons */}
+        {categories.map(({ label, type }) => (
+          <Button
+            key={type}
+            onClick={() => document.getElementById(type).scrollIntoView({ behavior: 'smooth' })}
+            _hover={{ bg: 'orange.500' }}
+            flexShrink={0}
           >
-            <Heading as="h2" size="lg">
-              {label}
-            </Heading>
-            <Icon as={isOpen[type] ? ChevronUpIcon : ChevronDownIcon} w={6} h={6} />
-          </Flex>
-          <Collapse in={isOpen[type]}>
-            <VStack spacing="4" align="start" mt="4">
-              {(menuItems[type] || []).map((item, index) => (
-                <Box
-                  key={index}
-                  p="2"
-                  borderWidth="3px"
-                  borderRadius="xl"
-                  w="50%"
-                  margin="auto"
-                  mt="4"
-                  boxShadow="md"
-                  textAlign="center"
-                >
-                  <Text fontWeight="bold" fontSize="xl">
-                    {item.foodname}
-                  </Text>
-                  <Box mt="2">
-                    <Text>{item.description}</Text>
-                  </Box>
-                  <Flex justifyContent="center" alignItems="center" mt="2">
-                    <Text alignSelf="flex-start">{item.description ? 'on its own' : ''}</Text>
-                    <Box ml="2">£{item.foodprice}</Box>
-                  </Flex>
+            {label}
+          </Button>
+        ))}
+      </HStack>
+      {/* Render menu items for each category */}
+      {categories.map(({ label, type }) => (
+        <Box key={type} my="12" id={type}>
+          <Heading as="h2" size="lg" mb="4">
+            {label}
+          </Heading>
+          <VStack spacing="4" align="start">
+            {(menuItemsCache[type] || []).map((item, index) => (
+              <Box
+                key={index}
+                p="2"
+                borderWidth="3px"
+                borderRadius="xl"
+                w={{ base: '100%', md: '75%', lg: '50%' }}
+                margin="auto"
+                mt="4"
+                boxShadow="md"
+                textAlign="center"
+              >
+                <Text fontWeight="bold" fontSize="xl">
+                  {item.foodname}
+                </Text>
+                <Box mt="2">
+                  <Text>{item.description}</Text>
                 </Box>
-              ))}
-            </VStack>
-            {isSignedIn && (
-              <Box as="form" onSubmit={(e) => handleSubmit(e, type)} mt="4">
-                <FormControl mb="4">
-                  <FormLabel>Name:</FormLabel>
-                  <Input
-                    type="text"
-                    name="name"
-                    value={newItems[type].name}
-                    onChange={(e) => handleInputChange(e, type)}
-                    placeholder="Enter item name"
-                    required
-                  />
-                </FormControl>
-                <FormControl mb="4">
-                  <FormLabel>Price:</FormLabel>
-                  <Input
-                    type="text"
-                    name="price"
-                    value={newItems[type].price}
-                    onChange={(e) => handleInputChange(e, type)}
-                    placeholder="Enter item price"
-                    required
-                  />
-                </FormControl>
-                <FormControl mb="4">
-                  <FormLabel>Description:</FormLabel>
-                  <Textarea
-                    name="description"
-                    value={newItems[type].description}
-                    onChange={(e) => handleInputChange(e, type)}
-                    placeholder="Enter item description"
-                    required
-                  />
-                </FormControl>
-                {errors[type] && <Text color="red.500">{errors[type]}</Text>}
-                <Button type="submit" colorScheme="orange">
-                  Add {label}
-                </Button>
+                <Flex justifyContent="center" alignItems="center" mt="2">
+                  <Text alignSelf="flex-start">{item.description ? 'on its own' : ''}</Text>
+                  <Box ml="2">£{item.foodprice}</Box>
+                </Flex>
+                {/* Delete button */}
+                {isSignedIn && (
+                  <Button colorScheme="red" mt="2" onClick={() => handleDelete(type, item.foodname)}>
+                    Delete
+                  </Button>
+                )}
               </Box>
-            )}
-          </Collapse>
+            ))}
+          </VStack>
+          {/* Render form to add new menu item if user is signed in */}
+          {isSignedIn && (
+            <Box as="form" onSubmit={(e) => handleSubmit(e, type)} mt="4">
+              <FormControl mb="4">
+                <FormLabel>Name:</FormLabel>
+                <Input
+                  type="text"
+                  name="name"
+                  placeholder="Enter item name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                />
+              </FormControl>
+              <FormControl mb="4">
+                <FormLabel>Price:</FormLabel>
+                <Input
+                  type="text"
+                  name="price"
+                  placeholder="Enter item price"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  required
+                />
+              </FormControl>
+              <FormControl mb="4">
+                <FormLabel>Description:</FormLabel>
+                <Textarea
+                  name="description"
+                  placeholder="Enter item description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  required
+                />
+              </FormControl>
+              <Button type="submit" colorScheme="orange">
+                Add {label}
+              </Button>
+            </Box>
+          )}
         </Box>
       ))}
+      {/* Footer */}
+      <Box
+        as="footer"
+        position="absolute"
+        bottom="0"
+        left="0"
+        width="100%"
+        bg="black"
+        p="4"
+        textAlign="center"
+        borderTop="2px"
+        borderColor="black"
+        color="white"
+      >
+        <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold">
+          UPGRADE TO A MEAL +£1.50
+        </Text>
+      </Box>
     </Container>
   );
 };

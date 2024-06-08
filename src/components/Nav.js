@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Flex, Box, Button, VStack, Center, useMediaQuery } from '@chakra-ui/react';
 import { IconHome2, IconBurger, IconAddressBook, IconMenu2 } from '@tabler/icons-react';
@@ -8,9 +8,23 @@ import MobileNav from '../../pages/MobileNav';
 
 const Nav = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [isNavVisible, setIsNavVisible] = useState(true); // State variable to track nav visibility
   const { signOut } = useClerk();
   const [isMobile] = useMediaQuery("(max-width: 768px)");
   const router = useRouter();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      setIsNavVisible(scrollTop <= 0); // Hide nav when scrollTop is at top
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const toggleNav = () => {
     setIsNavOpen(!isNavOpen);
@@ -69,7 +83,7 @@ const Nav = () => {
 
   return (
     <>
-      {navIcon}
+      {isNavVisible && navIcon} {/* Conditionally render nav based on isNavVisible */}
       <Flex
         direction="column"
         width={{ base: 300 }}
