@@ -166,8 +166,9 @@ const MenuPage = ({ initialMenuItems }) => {
             pb="4"
             cursor="pointer"
             onClick={() => toggleCollapse(type)}
+            direction={{ base: 'column', md: 'row' }} // Adjust direction based on screen size
           >
-            <Heading as="h2" size="lg">
+            <Heading as="h2" size="lg" mb={{ base: '4', md: '0' }}> {/* Adjust margin bottom based on screen size */}
               {label}
             </Heading>
             <Icon as={isOpen[type] ? ChevronUpIcon : ChevronDownIcon} w={6} h={6} />
