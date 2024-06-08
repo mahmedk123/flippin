@@ -2,9 +2,15 @@ import { sql } from '@vercel/postgres';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { name, price, type, description } = req.body;
-    if (!name || !price || !type || !description) {
-      return res.status(400).json({ error: 'Name, price, and type are required' });
+    const { name, price, description } = req.body;
+    const { type } = req.query;
+
+    if (!name || !price || !description) {
+      return res.status(400).json({ error: 'Name, price, and description are required' });
+    }
+
+    if (!type) {
+      return res.status(400).json({ error: 'Type is required' });
     }
 
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -21,6 +27,11 @@ export default async function handler(req, res) {
     }
   } else if (req.method === 'GET') {
     const { type } = req.query;
+
+    if (!type) {
+      return res.status(400).json({ error: 'Type is required' });
+    }
+
     try {
       const result = await sql`
         SELECT * FROM test WHERE foodType = ${type}

@@ -78,6 +78,7 @@ const MenuPage = ({ initialMenuItems }) => {
   );
 
   const { isSignedIn } = useUser();
+  const [formData, setFormData] = useState({ name: '', price: '', description: '' });
 
   const toggleCollapse = (type) => {
     setIsOpen((prev) => ({
@@ -111,6 +112,43 @@ const MenuPage = ({ initialMenuItems }) => {
       }
     });
   }, [menuItemsCache, fetchStatus]);
+
+  const handleSubmit = async (e, type) => {
+    e.preventDefault();
+    const newItem = {
+      name: formData.name,
+      price: formData.price,
+      description: formData.description,
+    };
+    try {
+      const res = await fetch(`/api/menuItem?type=${type}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newItem),
+      });
+  
+      if (!res.ok) {
+        throw new Error(`Failed to add new menu item: ${res.statusText}`);
+      }
+  
+      // Read the response body once
+      const responseData = await res.clone().json();
+  
+      // Handle the response data
+      // console.log(responseData);
+  
+      // Update state or perform any other actions as needed
+      setMenuItemsCache((prev) => ({
+        ...prev,
+        [type]: [...prev[type], responseData],
+      }));
+      setFormData({ name: '', price: '', description: '' });
+    } catch (error) {
+      console.error('Error adding new menu item:', error);
+    }
+  };
 
   return (
     <Container maxW="container.xl" minH="100vh" position="relative" pb="40px">
@@ -162,13 +200,15 @@ const MenuPage = ({ initialMenuItems }) => {
               ))}
             </VStack>
             {isSignedIn && (
-              <Box as="form" onSubmit={(e) => e.preventDefault()} mt="4">
+              <Box as="form" onSubmit={(e) => handleSubmit(e, type)} mt="4">
                 <FormControl mb="4">
                   <FormLabel>Name:</FormLabel>
                   <Input
                     type="text"
                     name="name"
                     placeholder="Enter item name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
                   />
                 </FormControl>
@@ -178,6 +218,8 @@ const MenuPage = ({ initialMenuItems }) => {
                     type="text"
                     name="price"
                     placeholder="Enter item price"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     required
                   />
                 </FormControl>
@@ -186,6 +228,8 @@ const MenuPage = ({ initialMenuItems }) => {
                   <Textarea
                     name="description"
                     placeholder="Enter item description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     required
                   />
                 </FormControl>
