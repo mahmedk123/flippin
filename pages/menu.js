@@ -70,6 +70,24 @@ const MenuPage = ({ initialMenuItems }) => {
   const { isSignedIn } = useUser();
   const [formData, setFormData] = useState({ name: '', price: '', description: '' });
 
+  const handleDelete = async (type, name) => {
+    try {
+      const res = await fetch(`/api/menuItem?type=${type}&name=${name}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) {
+        throw new Error('Failed to delete menu item');
+      }
+      // Remove the deleted menu item from state
+      setMenuItemsCache((prev) => ({
+        ...prev,
+        [type]: prev[type].filter(item => item.foodname !== name),
+      }));
+    } catch (error) {
+      console.error('Error deleting menu item:', error);
+    }
+  };
+
   const fetchMenuData = async (type) => {
     try {
       const res = await fetch(`/api/menuItem?type=${type}`);
@@ -109,16 +127,16 @@ const MenuPage = ({ initialMenuItems }) => {
         },
         body: JSON.stringify(newItem),
       });
-
+  
       if (!res.ok) {
         throw new Error(`Failed to add new menu item: ${res.statusText}`);
       }
-
+  
       const responseData = await res.json();
-
+  
       setMenuItemsCache((prev) => ({
         ...prev,
-        [type]: [...prev[type], responseData],
+        [type]: [...(prev[type] || []), responseData], // Ensure prev[type] is iterable
       }));
       setFormData({ name: '', price: '', description: '' });
     } catch (error) {
@@ -151,6 +169,7 @@ const MenuPage = ({ initialMenuItems }) => {
           scrollbarWidth: 'none',
         }}
       >
+        {/* Render category buttons */}
         {categories.map(({ label, type }) => (
           <Button
             key={type}
@@ -162,6 +181,7 @@ const MenuPage = ({ initialMenuItems }) => {
           </Button>
         ))}
       </HStack>
+      {/* Render menu items for each category */}
       {categories.map(({ label, type }) => (
         <Box key={type} my="12" id={type}>
           <Heading as="h2" size="lg" mb="4">
@@ -190,9 +210,16 @@ const MenuPage = ({ initialMenuItems }) => {
                   <Text alignSelf="flex-start">{item.description ? 'on its own' : ''}</Text>
                   <Box ml="2">£{item.foodprice}</Box>
                 </Flex>
+                {/* Delete button */}
+                {isSignedIn && (
+                  <Button colorScheme="red" mt="2" onClick={() => handleDelete(type, item.foodname)}>
+                    Delete
+                  </Button>
+                )}
               </Box>
             ))}
           </VStack>
+          {/* Render form to add new menu item if user is signed in */}
           {isSignedIn && (
             <Box as="form" onSubmit={(e) => handleSubmit(e, type)} mt="4">
               <FormControl mb="4">
@@ -234,6 +261,7 @@ const MenuPage = ({ initialMenuItems }) => {
           )}
         </Box>
       ))}
+      {/* Footer */}
       <Box
         as="footer"
         position="absolute"
