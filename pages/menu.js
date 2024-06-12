@@ -12,10 +12,10 @@ import {
   Input,
   Textarea,
   VStack,
-  Icon,
   Text,
   HStack,
   useBreakpointValue,
+  Image,
 } from '@chakra-ui/react';
 
 const categories = [
@@ -37,10 +37,10 @@ export async function getStaticProps() {
         throw new Error(`Failed to fetch menu data for ${type}`);
       }
       const data = await res.json();
-      return data.length > 0 ? data : null; // Return null if no data
+      return data.length > 0 ? data : null;
     } catch (error) {
       console.error(`Error fetching menu data for ${type}:`, error);
-      return null; // Return null in case of error
+      return null;
     }
   };
 
@@ -61,7 +61,7 @@ export async function getStaticProps() {
     props: {
       initialMenuItems: menuItems,
     },
-    revalidate: 10, // Enable Incremental Static Regeneration
+    revalidate: 10,
   };
 }
 
@@ -69,17 +69,14 @@ const MenuPage = ({ initialMenuItems }) => {
   const [menuItemsCache, setMenuItemsCache] = useState(initialMenuItems);
   const { isSignedIn } = useUser();
   const [formData, setFormData] = useState({ name: '', price: '', description: '' });
+  const [imageURL, setImageURL] = useState('');
 
   const handleDelete = async (type, name) => {
-    // Encode the name before passing it to the API call
     const encodedName = encodeURIComponent(name);
-  
-    // Show confirmation dialog
     const isConfirmed = window.confirm('Are you sure you want to delete this item?');
     if (!isConfirmed) {
-      return; // If user cancels, do nothing
+      return;
     }
-  
     try {
       const res = await fetch(`/api/menuItem?type=${type}&name=${encodedName}`, {
         method: 'DELETE',
@@ -87,15 +84,9 @@ const MenuPage = ({ initialMenuItems }) => {
       if (!res.ok) {
         throw new Error('Failed to delete menu item');
       }
-  
       console.log('Menu item deleted successfully');
-  
-      // Remove the deleted menu item from state
       setMenuItemsCache((prev) => {
-        // Filter out the item with the matching name
         const filteredItems = prev[type].filter(item => item.foodname !== name);
-  
-        // Return the updated state with filtered items
         return {
           ...prev,
           [type]: filteredItems,
@@ -105,7 +96,6 @@ const MenuPage = ({ initialMenuItems }) => {
       console.error('Error deleting menu item:', error);
     }
   };
-  
 
   const fetchMenuData = async (type) => {
     try {
@@ -137,6 +127,7 @@ const MenuPage = ({ initialMenuItems }) => {
       name: formData.name,
       price: formData.price,
       description: formData.description,
+      imageURL: imageURL,
     };
     try {
       const res = await fetch(`/api/menuItem?type=${type}`, {
@@ -146,23 +137,59 @@ const MenuPage = ({ initialMenuItems }) => {
         },
         body: JSON.stringify(newItem),
       });
-  
       if (!res.ok) {
         throw new Error(`Failed to add new menu item: ${res.statusText}`);
       }
-  
       const responseData = await res.json();
-  
       setMenuItemsCache((prev) => ({
         ...prev,
-        [type]: [...(prev[type] || []), responseData], // Ensure prev[type] is iterable
+        [type]: [...(prev[type] || []), responseData],
       }));
       setFormData({ name: '', price: '', description: '' });
+       setImageURL('');
     } catch (error) {
       console.error('Error adding new menu item:', error);
     }
   };
 
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0]; // Assuming single file upload
+    if (!file) {
+      console.error('No file selected.');
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append('image', file);
+  
+    try {
+      const response = await fetch('/api/uploadImage', { // This URL should be your image upload endpoint
+        method: 'POST',
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text(); // Attempt to read server error response
+        throw new Error(`Image upload failed: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+  
+      const data = await response.json();
+  
+      if (data.url) { // Corrected from data.imageUrl to data.url
+        setImageURL(data.url); // Use the correct property from the response
+        console.log("imageURL set to:", data.url);
+        
+        // Here you can optionally set imageURL to state or perform other actions
+        const imageURL = data.url;
+        console.log("imageURL:", imageURL);
+      } else {
+        console.error('Received data:', data); // Log received data if url is missing
+        throw new Error('Invalid response from server: Missing url');
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
+  };
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
@@ -175,20 +202,15 @@ const MenuPage = ({ initialMenuItems }) => {
         overflowX="auto"
         spacing={4}
         pb={4}
-        mb={4}
-        borderBottom="2px"
-        borderColor="orange.500"
-        position="sticky" // Make the buttons sticky
-        top="0"
-        bg="white" // Ensure background color for better visibility
-        zIndex="10" // Ensure the buttons are above other content
+        mb={8}
         css={{
-          '&::-webkit-scrollbar': { display: 'none' },
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
           msOverflowStyle: 'none',
           scrollbarWidth: 'none',
         }}
       >
-        {/* Render category buttons */}
         {categories.map(({ label, type }) => (
           <Button
             key={type}
@@ -200,7 +222,6 @@ const MenuPage = ({ initialMenuItems }) => {
           </Button>
         ))}
       </HStack>
-      {/* Render menu items for each category */}
       {categories.map(({ label, type }) => (
         <Box key={type} my="12" id={type}>
           <Heading as="h2" size="lg" mb="4">
@@ -219,9 +240,9 @@ const MenuPage = ({ initialMenuItems }) => {
                 boxShadow="md"
                 textAlign="center"
               >
-                <Text fontWeight="bold" fontSize="xl">
-                  {item.foodname}
-                </Text>
+                  <Text fontWeight="bold" fontSize="xl">
+                    {item.foodname}
+                  </Text>
                 <Box mt="2">
                   <Text>{item.description}</Text>
                 </Box>
@@ -229,16 +250,28 @@ const MenuPage = ({ initialMenuItems }) => {
                   <Text alignSelf="flex-start">{item.description ? 'on its own' : ''}</Text>
                   <Box ml="2">£{item.foodprice}</Box>
                 </Flex>
-                {/* Delete button */}
+                <Flex justifyContent="center" alignItems="center" mt="2">
+                <Image
+  src={imageURL}
+  alt={item.foodname}
+  boxSize="200px"
+  objectFit="cover"
+  onError={(e) => {
+    console.error('Error loading image:', e);
+    // Optionally, you can display a placeholder image or fallback content here
+  }}
+/>
+                </Flex>
                 {isSignedIn && (
-                  <Button colorScheme="red" mt="2" onClick={() => handleDelete(type, item.foodname)}>
-                    Delete
-                  </Button>
+                 <Flex mt="2" justifyContent="flex-end">
+                 <Button colorScheme="red" onClick={() => handleDelete(type, item.foodname)}>
+                   Delete
+                 </Button>
+               </Flex>
                 )}
               </Box>
             ))}
           </VStack>
-          {/* Render form to add new menu item if user is signed in */}
           {isSignedIn && (
             <Box as="form" onSubmit={(e) => handleSubmit(e, type)} mt="4">
               <FormControl mb="4">
@@ -273,6 +306,14 @@ const MenuPage = ({ initialMenuItems }) => {
                   required
                 />
               </FormControl>
+              <FormControl mb="4">
+                <FormLabel>Image:</FormLabel>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                />
+              </FormControl>
               <Button type="submit" colorScheme="orange">
                 Add {label}
               </Button>
@@ -280,7 +321,6 @@ const MenuPage = ({ initialMenuItems }) => {
           )}
         </Box>
       ))}
-      {/* Footer */}
       <Box
         as="footer"
         position="absolute"
@@ -301,5 +341,4 @@ const MenuPage = ({ initialMenuItems }) => {
     </Container>
   );
 };
-
 export default MenuPage;
