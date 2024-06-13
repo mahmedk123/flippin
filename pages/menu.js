@@ -123,11 +123,12 @@ const MenuPage = ({ initialMenuItems }) => {
 
   const handleSubmit = async (e, type) => {
     e.preventDefault();
+  
     const newItem = {
       name: formData.name,
       price: formData.price,
       description: formData.description,
-      imageURL: imageURL,
+      imageURL: formData.imageURL,
     };
     try {
       const res = await fetch(`/api/menuItem?type=${type}`, {
@@ -145,46 +146,42 @@ const MenuPage = ({ initialMenuItems }) => {
         ...prev,
         [type]: [...(prev[type] || []), responseData],
       }));
-      setFormData({ name: '', price: '', description: '' });
-       setImageURL('');
+      setFormData({ name: '', price: '', description: '', imageURL: '' });
     } catch (error) {
       console.error('Error adding new menu item:', error);
     }
   };
-
+  
+  
+ 
   const handleImageUpload = async (event) => {
-    const file = event.target.files[0]; // Assuming single file upload
-    if (!file) {
+    if (!event.target.files || event.target.files.length === 0) {
       console.error('No file selected.');
       return;
     }
-  
+
+    const file = event.target.files[0];
     const formData = new FormData();
     formData.append('image', file);
-  
+
     try {
-      const response = await fetch('/api/uploadImage', { // This URL should be your image upload endpoint
+      const response = await fetch('/api/uploadImage', {
         method: 'POST',
         body: formData,
       });
-  
+
       if (!response.ok) {
-        const errorText = await response.text(); // Attempt to read server error response
+        const errorText = await response.text();
         throw new Error(`Image upload failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
-  
+
       const data = await response.json();
-  
-      if (data.url) { // Corrected from data.imageUrl to data.url
-        setImageURL(data.url); // Use the correct property from the response
-        console.log("imageURL set to:", data.url);
-        
-        // Here you can optionally set imageURL to state or perform other actions
-        const imageURL = data.url;
-        console.log("imageURL:", imageURL);
+
+      if (data.url) {
+        setFormData((prevFormData) => ({ ...prevFormData, imageURL: data.url }));
+        console.log("Image URL set to:", data.url);
       } else {
-        console.error('Received data:', data); // Log received data if url is missing
-        throw new Error('Invalid response from server: Missing url');
+        console.error('Received data:', data);
       }
     } catch (error) {
       console.error('Error uploading image:', error);
@@ -228,7 +225,7 @@ const MenuPage = ({ initialMenuItems }) => {
             {label}
           </Heading>
           <VStack spacing="4" align="start">
-            {(menuItemsCache[type] || []).map((item, index) => (
+          {(menuItemsCache[type] || []).map((item, index) => (
               <Box
                 key={index}
                 p="2"
@@ -240,9 +237,9 @@ const MenuPage = ({ initialMenuItems }) => {
                 boxShadow="md"
                 textAlign="center"
               >
-                  <Text fontWeight="bold" fontSize="xl">
-                    {item.foodname}
-                  </Text>
+                <Text fontWeight="bold" fontSize="xl">
+                  {item.foodname}
+                </Text>
                 <Box mt="2">
                   <Text>{item.description}</Text>
                 </Box>
@@ -251,23 +248,25 @@ const MenuPage = ({ initialMenuItems }) => {
                   <Box ml="2">£{item.foodprice}</Box>
                 </Flex>
                 <Flex justifyContent="center" alignItems="center" mt="2">
-                <Image
-  src={imageURL}
-  alt={item.foodname}
-  boxSize="200px"
-  objectFit="cover"
-  onError={(e) => {
-    console.error('Error loading image:', e);
-    // Optionally, you can display a placeholder image or fallback content here
-  }}
-/>
+                  {item.imageurl && (
+                    <Image
+                      src={item.imageurl}
+                      alt={item.foodname}
+                      boxSize="200px"
+                      objectFit="cover"
+                      onError={(e) => {
+                        console.error('Error loading image:', e);
+                        // Optionally, you can display a placeholder image or fallback content here
+                      }}
+                    />
+                  )}
                 </Flex>
                 {isSignedIn && (
-                 <Flex mt="2" justifyContent="flex-end">
-                 <Button colorScheme="red" onClick={() => handleDelete(type, item.foodname)}>
-                   Delete
-                 </Button>
-               </Flex>
+                  <Flex mt="2" justifyContent="flex-end">
+                    <Button colorScheme="red" onClick={() => handleDelete(type, item.foodname)}>
+                      Delete
+                    </Button>
+                  </Flex>
                 )}
               </Box>
             ))}
@@ -307,7 +306,6 @@ const MenuPage = ({ initialMenuItems }) => {
                 />
               </FormControl>
               <FormControl mb="4">
-                <FormLabel>Image:</FormLabel>
                 <Input
                   type="file"
                   accept="image/*"
@@ -341,4 +339,5 @@ const MenuPage = ({ initialMenuItems }) => {
     </Container>
   );
 };
+
 export default MenuPage;
