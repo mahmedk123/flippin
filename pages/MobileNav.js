@@ -25,7 +25,7 @@ const MobileNav = () => {
         variant="solid"
         bg="transparent"
         border="1px solid transparent"
-        _hover={{ bg: 'orange.500', color: 'black', borderRadius: '8px', fontWeight: 'bold' }} // Rectangular with bold text on hover
+        _hover={{ bg: 'orange.500', color: 'white', borderRadius: '8px', fontWeight: 'bold' }} // Rectangular with bold text on hover
         _active={{ bg: 'gray.800' }}
         leftIcon={<Icon as={IconComponent} boxSize="6" />}
         fontFamily="'Roboto', sans-serif"
