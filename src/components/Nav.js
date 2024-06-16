@@ -78,7 +78,7 @@ const Nav = () => {
       zIndex={1002}
       m="1rem"
     >
-      <Icon as={IconMenu2} />
+      <Icon as={IconMenu2} boxSize="6" />
     </Button>
   );
 
