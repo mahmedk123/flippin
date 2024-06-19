@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Flex, Box, Button, VStack, Center, useMediaQuery } from '@chakra-ui/react';
+import { Flex, Box, Button, VStack, Center, useMediaQuery, Icon } from '@chakra-ui/react';
 import { IconHome2, IconBurger, IconAddressBook, IconMenu2 } from '@tabler/icons-react';
 import { SignedIn, SignedOut, UserButton, useClerk } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
-import MobileNav from '../../pages/MobileNav';
 
 const Nav = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -49,15 +48,17 @@ const Nav = () => {
         key={link.label}
         color="white"
         size="lg"
-        variant="outline"
-        borderColor="transparent"
-        textDecoration="none"
-        _hover={{ bg: 'orange.500' }}
+        variant="solid"
+        bg="transparent"
+        border="1px solid transparent"
+        _hover={{ bg: 'orange.500', color: 'white', borderRadius: '8px', fontWeight: 'bold' }} // Rectangular with bold text on hover
         _active={{ bg: 'gray.800' }}
+        leftIcon={<Icon as={IconComponent} boxSize="6" />}
         fontFamily="'Roboto', sans-serif"
         fontSize="1.2em"
         mt="1rem"
-        leftIcon={<IconComponent />}
+        justifyContent="flex-start"
+        width="100%"
       >
         {link.label}
       </Button>
@@ -77,7 +78,7 @@ const Nav = () => {
       zIndex={1002}
       m="1rem"
     >
-      <IconMenu2 />
+      <Icon as={IconMenu2} boxSize="6" />
     </Button>
   );
 
@@ -99,7 +100,7 @@ const Nav = () => {
         zIndex={isNavOpen ? 1003 : 0} // Ensure nav is above content when open
       >
         <Box>
-          <VStack spacing="4" mt="4">
+          <VStack spacing="4" mt="4" align="center">
             {links}
           </VStack>
         </Box>
@@ -122,7 +123,7 @@ const Nav = () => {
               </Button>
             </SignedOut>
             <SignedIn>
-              <VStack spacing="4">
+              <VStack spacing="4" align="center">
                 <UserButton
                   afterSignOutUrl="/"
                   appearance={{

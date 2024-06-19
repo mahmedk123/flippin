@@ -3,20 +3,31 @@ import { sql } from '@vercel/postgres';
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     // Handle POST requests for creating a new menu item
-    const { name, price, description } = req.body;
+    const { name, price, description, imageURL } = req.body;
     const { type } = req.query;
 
     // Check if required fields are provided
     if (!name || !price || !description || !type) {
-      return res.status(400).json({ error: 'Name, price, description, and type are required' });
+      return res.status(400).json({ error: 'Name, price, description, type are required' });
     }
 
     try {
-      const result = await sql`
-        INSERT INTO test (foodName, foodPrice, foodType, description) 
-        VALUES (${name}, ${price}, ${type}, ${description})
-        RETURNING *
-      `;
+      let result;
+
+      if (imageURL) {
+        result = await sql`
+          INSERT INTO test (foodName, foodPrice, foodType, description, imageUrl) 
+          VALUES (${name}, ${price}, ${type}, ${description}, ${imageURL})
+          RETURNING *
+        `;
+      } else {
+        result = await sql`
+          INSERT INTO test (foodName, foodPrice, foodType, description) 
+          VALUES (${name}, ${price}, ${type}, ${description})
+          RETURNING *
+        `;
+      }
+
       res.status(201).json(result.rows[0]);
     } catch (error) {
       console.error('Error creating item:', error);

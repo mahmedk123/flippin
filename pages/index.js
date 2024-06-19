@@ -5,7 +5,7 @@ import Layout from '../src/components/Layout';
 import { ChakraProvider, Image } from '@chakra-ui/react';
 import theme from '../src/styles/theme.js';
 
-export default function Home() {
+export default function Home({ isMobile }) {
   return (
     <ChakraProvider theme={theme}>
       <Layout>
@@ -16,16 +16,17 @@ export default function Home() {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         </Head>
         <div className="content">
-          <header className="header">
-            <h1>10 ST HELENS ROAD BOLTON BL3 3NH</h1>
-            <div className="border-line"></div>
-          </header>
-          <Nav />
+          {!isMobile && (
+            <header className="header">
+              <h1>10 ST HELENS ROAD BOLTON BL3 3NH</h1>
+              <div className="border-line"></div>
+            </header>
+          )}
+          <Nav isMobile={isMobile} />
           <main className="main">
             <div className="logotest-container">
               <Image src="/flippin-white.svg" alt="Flippin Logo" className="logotest" />
             </div>
-            
             <div className="icons">
               <div className="icon-wrapper">
                 <Image src="/burger.svg" alt="Burger Icon" className="burger-icon" />
@@ -157,8 +158,8 @@ export default function Home() {
 
           /* Media query for mobile screens */
           @media (max-width: 768px) {
-            .header h1 {
-              font-size: 1.5em; /* Adjust header font size for smaller screens */
+            .header {
+              display: none; /* Hide header on mobile devices */
             }
 
             .logotest {
@@ -174,6 +175,7 @@ export default function Home() {
             }
 
             .burger-icon {
+              height: 5em; /* Make the burger icon larger for mobile */
               position: fixed; /* Position burger icon fixed for mobile */
               top: 10px; /* Adjust top position as needed */
               left: 10px; /* Adjust left position as needed */
@@ -212,4 +214,18 @@ export default function Home() {
       </Layout>
     </ChakraProvider>
   );
+}
+
+// Server-side rendering to detect mobile device
+export async function getServerSideProps(context) {
+  // Check if the request comes from a mobile device
+  const isMobile = context.req
+    ? /Mobile|iP(hone|od|ad)|Android|BlackBerry|IEMobile/.test(context.req.headers['user-agent'])
+    : false;
+
+  return {
+    props: {
+      isMobile,
+    },
+  };
 }
