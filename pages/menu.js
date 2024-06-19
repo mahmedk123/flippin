@@ -69,7 +69,7 @@ const MenuPage = ({ initialMenuItems }) => {
   const [menuItemsCache, setMenuItemsCache] = useState(initialMenuItems);
   const { isSignedIn } = useUser();
   const [formData, setFormData] = useState({ name: '', price: '', description: '' });
-  const [imageURL, setImageURL] = useState('');
+  // const [imageURL, setImageURL] = useState('');
 
   const handleDelete = async (type, name) => {
     const encodedName = encodeURIComponent(name);

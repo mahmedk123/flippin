@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Flex, Box, Button, VStack, Center, useMediaQuery, Icon } from '@chakra-ui/react';
-import { IconHome2, IconBurger, IconAddressBook, IconMenu2 } from '@tabler/icons-react';
+import { IconHome2, IconBurger, IconMeat, IconMenu2 } from '@tabler/icons-react';
 import { SignedIn, SignedOut, UserButton, useClerk } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
 
@@ -36,7 +36,7 @@ const Nav = () => {
   const mockdata = [
     { icon: IconHome2, label: 'Home', href: '/' },
     { icon: IconBurger, label: 'Menu', href: '/menu' },
-    { icon: IconAddressBook, label: 'Contact', href: '/contact' },
+    { icon: IconMeat, label: 'Offers', href: '/offers' },
   ];
 
   const links = mockdata.map((link) => {
