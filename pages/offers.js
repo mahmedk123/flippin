@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import {
   Box,
@@ -17,39 +17,12 @@ import {
 } from '@chakra-ui/react';
 import Nav from '../src/components/Nav';
 
-const categories = [
-  { foodType: 'offers' }
-];
+const categories = [{ foodType: 'offers' }];
 
-const OffersPage = () => {
+const OffersPage = ({ initialOfferItems }) => {
   const { isSignedIn } = useUser();
-  const [offerItemsCache, setOfferItemsCache] = useState({});
+  const [offerItemsCache, setOfferItemsCache] = useState(initialOfferItems);
   const [formData, setFormData] = useState({ name: '', price: '', description: '', imageURL: '' });
-
-  useEffect(() => {
-    const fetchOfferItems = async () => {
-      try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-        const promises = categories.map(async (category) => {
-          const res = await fetch(`${baseUrl}/api/offerItems?type=${category.foodType}`);
-          if (!res.ok) {
-            throw new Error(`Failed to fetch offer items for ${category.foodType}`);
-          }
-          const data = await res.json();
-          console.log('Fetched data:', data); // Log the fetched data
-          return { [category.foodType]: data };
-        });
-        const results = await Promise.all(promises);
-        const offerItems = results.reduce((acc, result) => ({ ...acc, ...result }), {});
-        setOfferItemsCache(offerItems);
-      } catch (error) {
-        console.error('Error fetching offer items:', error);
-      }
-    };
-    
-
-    fetchOfferItems();
-  }, []);
 
   const handleDelete = async (foodType, foodname) => {
     const encodedName = encodeURIComponent(foodname);
@@ -83,11 +56,13 @@ const OffersPage = () => {
       price: formData.price,
       description: formData.description,
       imageURL: formData.imageURL,
-      type: type,
+      type: type  // Include the type field
     };
 
+    console.log('Submitting new item:', newItem);  // Log the data
+
     try {
-      const res = await fetch(`/api/offerItems?type=${type}`, {
+      const res = await fetch(`/api/offerItems`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -95,7 +70,8 @@ const OffersPage = () => {
         body: JSON.stringify(newItem),
       });
       if (!res.ok) {
-        throw new Error(`Failed to add new offer item: ${res.statusText}`);
+        const errorText = await res.text();  // Capture error text
+        throw new Error(`Failed to add new offer item: ${res.statusText} - ${errorText}`);
       }
       const responseData = await res.json();
       setOfferItemsCache((prev) => ({
@@ -153,6 +129,31 @@ const OffersPage = () => {
         Offers
       </Heading>
 
+      <HStack
+        overflowX="auto"
+        spacing={4}
+        pb={4}
+        mb={8}
+        css={{
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
+          msOverflowStyle: 'none',
+          scrollbarWidth: 'none',
+        }}
+      >
+        {categories.map(({ foodType }) => (
+          <Button
+            key={foodType}
+            onClick={() => document.getElementById(foodType).scrollIntoView({ behavior: 'smooth' })}
+            _hover={{ bg: 'orange.500' }}
+            flexShrink={0}
+          >
+            {foodType}
+          </Button>
+        ))}
+      </HStack>
+
       {categories.map(({ foodType }) => (
         <Box key={foodType} my="12" id={foodType}>
           <Heading as="h2" size="lg" mb="4">
@@ -183,9 +184,9 @@ const OffersPage = () => {
                   <Box ml="2">£{item.foodprice}</Box>
                 </Flex>
                 <Flex justifyContent="center" alignItems="center" mt="2">
-                  {item.imageURL && ( // Ensure imageURL exists before rendering Image
+                  {item.imageurl && (
                     <Image
-                      src={item.imageURL} // Render imageURL
+                      src={item.imageurl}
                       alt={item.foodname}
                       boxSize="200px"
                       objectFit="cover"
@@ -248,6 +249,31 @@ const OffersPage = () => {
       ))}
     </Container>
   );
+};
+
+export const getServerSideProps = async () => {
+  const fetchOfferItems = async () => {
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const promises = categories.map(async (category) => {
+      const res = await fetch(`${baseUrl}/api/offerItems?type=${category.foodType}`);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch offer items for ${category.foodType}`);
+      }
+      const data = await res.json();
+      console.log('Fetched data:', data);
+      return { [category.foodType]: data };
+    });
+    const results = await Promise.all(promises);
+    return results.reduce((acc, result) => ({ ...acc, ...result }), {});
+  };
+
+  const offerItems = await fetchOfferItems();
+
+  return {
+    props: {
+      initialOfferItems: offerItems,
+    },
+  };
 };
 
 export default OffersPage;
