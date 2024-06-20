@@ -254,17 +254,22 @@ const OffersPage = ({ initialOfferItems }) => {
 export const getServerSideProps = async () => {
   const fetchOfferItems = async () => {
     const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    const promises = categories.map(async (category) => {
-      const res = await fetch(`${baseUrl}/api/offerItems?type=${category.foodType}`);
-      if (!res.ok) {
-        throw new Error(`Failed to fetch offer items for ${category.foodType}`);
-      }
-      const data = await res.json();
-      console.log('Fetched data:', data);
-      return { [category.foodType]: data };
-    });
-    const results = await Promise.all(promises);
-    return results.reduce((acc, result) => ({ ...acc, ...result }), {});
+    try {
+      const promises = categories.map(async (category) => {
+        const res = await fetch(`${baseUrl}/api/offerItems?type=${category.foodType}`);
+        if (!res.ok) {
+          throw new Error(`Failed to fetch offer items for ${category.foodType}`);
+        }
+        const data = await res.json();
+        console.log('Fetched data:', data);
+        return { [category.foodType]: data };
+      });
+      const results = await Promise.all(promises);
+      return results.reduce((acc, result) => ({ ...acc, ...result }), {});
+    } catch (error) {
+      console.error('Error fetching offer items:', error);
+      return {};
+    }
   };
 
   const offerItems = await fetchOfferItems();
