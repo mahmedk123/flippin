@@ -19,14 +19,14 @@ import {
 } from '@chakra-ui/react';
 
 const categories = [
-  { label: 'Offers', type: 'offers' }, // Adjusted categories for offers
+  { label: 'Offers', type: 'offers' }
 ];
 
 export async function getStaticProps() {
   const fetchOfferData = async (type) => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || ''; // Replace '' with your default base URL if needed
-      const res = await fetch(`${baseUrl}/api/offerItems?type=${type}`);
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+      const res = await fetch(`${baseUrl}/api/offerItems?type=${type}`); // Ensure correct endpoint name and query parameter
       if (!res.ok) {
         throw new Error(`Failed to fetch offer data for ${type}`);
       }
@@ -63,7 +63,7 @@ export async function getStaticProps() {
 const OffersPage = ({ initialOfferItems }) => {
   const [offerItemsCache, setOfferItemsCache] = useState(initialOfferItems);
   const { isSignedIn } = useUser();
-  const [formData, setFormData] = useState({ name: '', price: '', description: '', imageURL: '' });
+  const [formData, setFormData] = useState({ name: '', price: '', description: '' });
 
   const handleDelete = async (type, name) => {
     const encodedName = encodeURIComponent(name);
@@ -90,6 +90,7 @@ const OffersPage = ({ initialOfferItems }) => {
       console.error('Error deleting offer item:', error);
     }
   };
+  
 
   const fetchOfferData = async (type) => {
     try {
@@ -120,10 +121,10 @@ const OffersPage = ({ initialOfferItems }) => {
   
     const newItem = {
       name: formData.name,
-      price: parseFloat(formData.price), // Ensure price is sent as number or string
+      price: formData.price,
       description: formData.description,
       imageURL: formData.imageURL,
-      type: type, // Ensure type is correctly passed
+      type: type, // Ensure you include the type in the payload if necessary
     };
   
     try {
@@ -150,7 +151,9 @@ const OffersPage = ({ initialOfferItems }) => {
     }
   };
   
-
+  
+  
+ 
   const handleImageUpload = async (event) => {
     if (!event.target.files || event.target.files.length === 0) {
       console.error('No file selected.');
@@ -184,7 +187,6 @@ const OffersPage = ({ initialOfferItems }) => {
       console.error('Error uploading image:', error);
     }
   };
-
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
@@ -223,7 +225,7 @@ const OffersPage = ({ initialOfferItems }) => {
             {label}
           </Heading>
           <VStack spacing="4" align="start">
-            {(offerItemsCache[type] || []).map((item, index) => (
+          {(offerItemsCache[type] || []).map((item, index) => (
               <Box
                 key={index}
                 p="2"
