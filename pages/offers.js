@@ -261,25 +261,35 @@ export const getServerSideProps = async () => {
           throw new Error(`Failed to fetch offer items for ${category.foodType}`);
         }
         const data = await res.json();
-        console.log('Fetched data:', data);
         return { [category.foodType]: data };
       });
       const results = await Promise.all(promises);
       return results.reduce((acc, result) => ({ ...acc, ...result }), {});
     } catch (error) {
       console.error('Error fetching offer items:', error);
-      return {};
+      throw new Error('Failed to fetch offer items');
     }
   };
 
-  const offerItems = await fetchOfferItems();
+  try {
+    const offerItems = await fetchOfferItems();
 
-  return {
-    props: {
-      initialOfferItems: offerItems,
-    },
-  };
-  
+    return {
+      props: {
+        initialOfferItems: offerItems,
+      },
+      
+    };
+  } catch (error) {
+    console.error('Error fetching offer items:', error);
+    return {
+      props: {
+        initialOfferItems: {},
+      },
+    };
+  }
 };
+
+
 
 export default OffersPage;
