@@ -251,7 +251,7 @@ const OffersPage = ({ initialOfferItems }) => {
   );
 };
 
-export const getServerSideProps = async () => {
+export async function getStaticProps()  {
   const fetchOfferItems = async () => {
     const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
     try {
