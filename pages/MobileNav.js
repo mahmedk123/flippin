@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Box, VStack, Button, Icon } from '@chakra-ui/react';
-import { IconHome2, IconBurger, IconAddressBook } from '@tabler/icons-react';
+import { IconHome2, IconBurger, IconMeat  } from '@tabler/icons-react';
 import { SignedIn, SignedOut, UserButton, useClerk } from '@clerk/nextjs';
 
 const MobileNav = () => {
@@ -10,7 +10,7 @@ const MobileNav = () => {
   const mockdata = [
     { icon: IconHome2, label: 'Home', href: '/' },
     { icon: IconBurger, label: 'Menu', href: '/menu' },
-    { icon: IconAddressBook, label: 'Contact', href: '/contact' },
+    { icon: IconMeat, label: 'Offers', href: '/offers' },
   ];
 
   const links = mockdata.map((link) => {

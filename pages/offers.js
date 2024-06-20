@@ -14,22 +14,15 @@ import {
   VStack,
   Text,
   HStack,
-  useBreakpointValue,
   Image,
 } from '@chakra-ui/react';
 
 const categories = [
-  { label: 'Smash Burgers', type: 'smashburgers' },
-  { label: 'Chicken Burgers', type: 'chickenBurgers' },
-  { label: 'Wraps', type: 'wraps' },
-  { label: 'Wings', type: 'wings' },
-  { label: 'Chicken', type: 'chicken' },
-  { label: 'Sizzlers', type: 'sizzlers' },
-  { label: 'Hot Dogs', type: 'hotdogs' },
+  { label: 'Offers', type: 'offers' },
 ];
 
 export async function getStaticProps() {
-  const fetchMenuData = async (type) => {
+  const fetchOfferData = async (type) => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
       const res = await fetch(`${baseUrl}/api/menuItem?type=${type}`);
@@ -44,33 +37,32 @@ export async function getStaticProps() {
     }
   };
 
-  const menuItems = {};
+  const offerItems = {};
   for (const category of categories) {
     try {
-      const data = await fetchMenuData(category.type);
+      const data = await fetchOfferData(category.type);
       if (data) {
-        menuItems[category.type] = data;
+        offerItems[category.type] = data;
       }
     } catch (error) {
       console.error(`Error fetching data for category ${category.type}:`, error);
-      menuItems[category.type] = [];
+      offerItems[category.type] = [];
     }
   }
 
   return {
     props: {
-      initialMenuItems: menuItems,
+      initialOfferItems: offerItems,
     },
     revalidate: 10,
   };
 }
 
-const MenuPage = ({ initialMenuItems }) => {
-  const [menuItemsCache, setMenuItemsCache] = useState(initialMenuItems);
+const OfferPage = ({ initialOfferItems }) => {
+  const [offerItemsCache, setOfferItemsCache] = useState(initialOfferItems);
   const { isSignedIn } = useUser();
   const [formData, setFormData] = useState({ name: '', price: '', description: '' });
-  // const [imageURL, setImageURL] = useState('');
-
+  
   const handleDelete = async (type, name) => {
     const encodedName = encodeURIComponent(name);
     const isConfirmed = window.confirm('Are you sure you want to delete this item?');
@@ -85,7 +77,7 @@ const MenuPage = ({ initialMenuItems }) => {
         throw new Error('Failed to delete menu item');
       }
       console.log('Menu item deleted successfully');
-      setMenuItemsCache((prev) => {
+      setOfferItemsCache((prev) => {
         const filteredItems = prev[type].filter(item => item.foodname !== name);
         return {
           ...prev,
@@ -97,7 +89,7 @@ const MenuPage = ({ initialMenuItems }) => {
     }
   };
 
-  const fetchMenuData = async (type) => {
+  const fetchOfferData = async (type) => {
     try {
       const res = await fetch(`/api/menuItem?type=${type}`);
       if (!res.ok) {
@@ -105,21 +97,21 @@ const MenuPage = ({ initialMenuItems }) => {
       }
       const data = await res.json();
       if (data.length > 0) {
-        setMenuItemsCache((prev) => ({ ...prev, [type]: data }));
+        setOfferItemsCache((prev) => ({ ...prev, [type]: data }));
       }
     } catch (error) {
       console.error(`Error fetching menu data for ${type}:`, error);
-      setMenuItemsCache((prev) => ({ ...prev, [type]: [] }));
+      setOfferItemsCache((prev) => ({ ...prev, [type]: [] }));
     }
   };
 
   useEffect(() => {
     categories.forEach(({ type }) => {
-      if (!menuItemsCache[type] || menuItemsCache[type].length === 0) {
-        fetchMenuData(type);
+      if (!offerItemsCache[type] || offerItemsCache[type].length === 0) {
+        fetchOfferData(type);
       }
     });
-  }, [menuItemsCache]);
+  }, [offerItemsCache]);
 
   const handleSubmit = async (e, type) => {
     e.preventDefault();
@@ -142,7 +134,7 @@ const MenuPage = ({ initialMenuItems }) => {
         throw new Error(`Failed to add new menu item: ${res.statusText}`);
       }
       const responseData = await res.json();
-      setMenuItemsCache((prev) => ({
+      setOfferItemsCache((prev) => ({
         ...prev,
         [type]: [...(prev[type] || []), responseData],
       }));
@@ -187,13 +179,12 @@ const MenuPage = ({ initialMenuItems }) => {
       console.error('Error uploading image:', error);
     }
   };
-  const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
     <Container maxW="container.xl" minH="100vh" position="relative" pb="40px">
       <Nav />
       <Heading as="h1" textAlign="center" my="8">
-        Menu
+        Offers
       </Heading>
       <HStack
         overflowX="auto"
@@ -208,7 +199,7 @@ const MenuPage = ({ initialMenuItems }) => {
           scrollbarWidth: 'none',
         }}
       >
-        {categories.map(({ label, type }) => (
+        {/* {categories.map(({ label, type }) => (
           <Button
             key={type}
             onClick={() => document.getElementById(type).scrollIntoView({ behavior: 'smooth' })}
@@ -217,7 +208,7 @@ const MenuPage = ({ initialMenuItems }) => {
           >
             {label}
           </Button>
-        ))}
+        ))} */}
       </HStack>
       {categories.map(({ label, type }) => (
         <Box key={type} my="12" id={type}>
@@ -225,7 +216,7 @@ const MenuPage = ({ initialMenuItems }) => {
             {label}
           </Heading>
           <VStack spacing="4" align="start">
-          {(menuItemsCache[type] || []).map((item, index) => (
+          {(offerItemsCache[type] || []).map((item, index) => (
               <Box
                 key={index}
                 p="2"
@@ -340,4 +331,4 @@ const MenuPage = ({ initialMenuItems }) => {
   );
 };
 
-export default MenuPage;
+export default OfferPage;
