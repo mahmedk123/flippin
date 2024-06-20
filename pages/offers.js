@@ -279,6 +279,7 @@ export const getServerSideProps = async () => {
       initialOfferItems: offerItems,
     },
   };
+  
 };
 
 export default OffersPage;
