@@ -25,7 +25,7 @@ const categories = [
 export async function getStaticProps() {
   const fetchOfferData = async (type) => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || ''; // Replace '' with your default base URL if needed
       const res = await fetch(`${baseUrl}/api/offerItems?type=${type}`);
       if (!res.ok) {
         throw new Error(`Failed to fetch offer data for ${type}`);
@@ -37,6 +37,7 @@ export async function getStaticProps() {
       return null;
     }
   };
+  
 
   const offerItems = {};
   for (const category of categories) {
