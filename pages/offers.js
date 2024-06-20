@@ -20,41 +20,31 @@ import Nav from '../src/components/Nav';
 const categories = [{ foodType: 'offers' }];
 
 export async function getStaticProps() {
-  const fetchOfferData = async (foodType) => {
-    try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-      const res = await fetch(`${baseUrl}/api/offerItems?type=${foodType}`); // Corrected endpoint
-      if (!res.ok) {
-        throw new Error(`Failed to fetch offer data for ${foodType}`);
-      }
-      const data = await res.json();
-      return data.length > 0 ? data : null;
-    } catch (error) {
-      console.error(`Error fetching menu data for ${foodType}:`, error);
-      return null;
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const res = await fetch(`${baseUrl}/api/offerItems?type=offers`);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch offer data for offers - ${res.status} ${res.statusText}`);
     }
-  };
-
-  const offerItems = {};
-  for (const category of categories) {
-    try {
-      const data = await fetchOfferData(category.foodType);
-      if (data) {
-        offerItems[category.foodType] = data;
-      }
-    } catch (error) {
-      console.error(`Error fetching data for category ${category.foodType}:`, error);
-      offerItems[category.foodType] = [];
-    }
+    const data = await res.json();
+    const initialOfferItems = data.length > 0 ? { offers: data } : {};
+    
+    return {
+      props: {
+        initialOfferItems,
+      },
+      revalidate: 10,
+    };
+  } catch (error) {
+    console.error(`Error fetching offer data for offers:`, error);
+    return {
+      props: {
+        initialOfferItems: {}, // Return empty initial data or handle fallback gracefully
+      },
+      revalidate: 10,
+    };
   }
-
-  return {
-    props: {
-      initialOfferItems: offerItems,
-    },
-    revalidate: 10,
-  };
-};
+}
 
 const OffersPage = ({ initialOfferItems }) => {
   const { isSignedIn } = useUser();
