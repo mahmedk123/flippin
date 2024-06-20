@@ -19,6 +19,43 @@ import Nav from '../src/components/Nav';
 
 const categories = [{ foodType: 'offers' }];
 
+export async function getStaticProps() {
+  const fetchOfferData = async (foodType) => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+      const res = await fetch(`${baseUrl}/api/offerItems?type=${foodType}`); // Corrected endpoint
+      if (!res.ok) {
+        throw new Error(`Failed to fetch offer data for ${foodType}`);
+      }
+      const data = await res.json();
+      return data.length > 0 ? data : null;
+    } catch (error) {
+      console.error(`Error fetching menu data for ${foodType}:`, error);
+      return null;
+    }
+  };
+
+  const offerItems = {};
+  for (const category of categories) {
+    try {
+      const data = await fetchOfferData(category.foodType);
+      if (data) {
+        offerItems[category.foodType] = data;
+      }
+    } catch (error) {
+      console.error(`Error fetching data for category ${category.foodType}:`, error);
+      offerItems[category.foodType] = [];
+    }
+  }
+
+  return {
+    props: {
+      initialOfferItems: offerItems,
+    },
+    revalidate: 10,
+  };
+};
+
 const OffersPage = ({ initialOfferItems }) => {
   const { isSignedIn } = useUser();
   const [offerItemsCache, setOfferItemsCache] = useState(initialOfferItems);
@@ -30,7 +67,7 @@ const OffersPage = ({ initialOfferItems }) => {
     if (!isConfirmed) {
       return;
     }
-
+  
     try {
       const res = await fetch(`/api/offerItems?type=${foodType}&name=${encodedName}`, {
         method: 'DELETE',
@@ -39,14 +76,20 @@ const OffersPage = ({ initialOfferItems }) => {
         throw new Error('Failed to delete offer item');
       }
       console.log('Offer item deleted successfully');
-      setOfferItemsCache((prev) => ({
-        ...prev,
-        [foodType]: prev[foodType].filter((item) => item.foodname !== foodname),
-      }));
+      
+      // Update offerItemsCache immediately after successful deletion
+      setOfferItemsCache((prev) => {
+        const filteredItems = prev[foodType].filter(item => item.foodname !== foodname); // Use foodname here
+        return {
+          ...prev,
+          [foodType]: filteredItems,
+        };
+      });
     } catch (error) {
       console.error('Error deleting offer item:', error);
     }
   };
+  
 
   const handleSubmit = async (e, type) => {
     e.preventDefault();
@@ -89,26 +132,26 @@ const OffersPage = ({ initialOfferItems }) => {
       console.error('No file selected.');
       return;
     }
-
+  
     const file = event.target.files[0];
     const formData = new FormData();
     formData.append('image', file);
-
+  
     try {
       const response = await fetch('/api/uploadImage', {
         method: 'POST',
         body: formData,
       });
-
+  
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Image upload failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
-
+  
       const data = await response.json();
-
+  
       if (data.url) {
-        setFormData((prevFormData) => ({ ...prevFormData, imageURL: data.url }));
+        setFormData((prevFormData) => ({ ...prevFormData, imageURL: data.url })); // Update imageURL in state
         console.log("Image URL set to:", data.url);
       } else {
         console.error('Received data:', data);
@@ -117,6 +160,7 @@ const OffersPage = ({ initialOfferItems }) => {
       console.error('Error uploading image:', error);
     }
   };
+  
 
   return (
     <Container maxW="container.xl" minH="100vh" position="relative" pb="40px">
@@ -161,50 +205,52 @@ const OffersPage = ({ initialOfferItems }) => {
           </Heading>
 
           <VStack spacing="4" align="start">
-            {(offerItemsCache[foodType] || []).map((item, index) => (
-              <Box
-                key={index}
-                p="2"
-                borderWidth="3px"
-                borderRadius="xl"
-                w={{ base: '100%', md: '75%', lg: '50%' }}
-                margin="auto"
-                mt="4"
-                boxShadow="md"
-                textAlign="center"
-              >
-                <Text fontWeight="bold" fontSize="xl">
-                  {item.foodname}
-                </Text>
-                <Box mt="2">
-                  <Text>{item.description}</Text>
-                </Box>
-                <Flex justifyContent="center" alignItems="center" mt="2">
-                  <Text alignSelf="flex-start">{item.description ? 'on its own' : ''}</Text>
-                  <Box ml="2">£{item.foodprice}</Box>
-                </Flex>
-                <Flex justifyContent="center" alignItems="center" mt="2">
-                  {item.imageurl && (
-                    <Image
-                      src={item.imageurl}
-                      alt={item.foodname}
-                      boxSize="200px"
-                      objectFit="cover"
-                      onError={(e) => {
-                        console.error('Error loading image:', e);
-                      }}
-                    />
-                  )}
-                </Flex>
-                {isSignedIn && (
-                  <Flex justifyContent="center" mt="4">
-                    <Button colorScheme="red" onClick={() => handleDelete(foodType, item.foodname)}>
-                      Delete
-                    </Button>
-                  </Flex>
-                )}
-              </Box>
-            ))}
+            
+          {offerItemsCache[foodType].map((item, index) => (
+  <Box
+    key={index}
+    p="2"
+    borderWidth="3px"
+    borderRadius="xl"
+    w={{ base: '100%', md: '75%', lg: '50%' }}
+    margin="auto"
+    mt="4"
+    boxShadow="md"
+    textAlign="center"
+  >
+    <Text fontWeight="bold" fontSize="xl">
+      {item.foodname}
+    </Text>
+    <Box mt="2">
+      <Text>{item.description}</Text>
+    </Box>
+    <Flex justifyContent="center" alignItems="center" mt="2">
+      <Text alignSelf="flex-start">{item.description ? 'on its own' : ''}</Text>
+      <Box ml="2">£{item.foodprice}</Box>
+    </Flex>
+    <Flex justifyContent="center" alignItems="center" mt="2">
+      {item.imageURL && (
+        <Image
+          src={item.imageURL} // Use imageURL here
+          alt={item.foodname}
+          boxSize="200px"
+          objectFit="cover"
+          onError={(e) => {
+            console.error('Error loading image:', e);
+          }}
+        />
+      )}
+    </Flex>
+    {isSignedIn && (
+      <Flex justifyContent="center" mt="4">
+        <Button colorScheme="red" onClick={() => handleDelete(foodType, item.foodname)}>
+          Delete
+        </Button>
+      </Flex>
+    )}
+  </Box>
+))}
+
           </VStack>
 
           {isSignedIn && (
@@ -251,44 +297,7 @@ const OffersPage = ({ initialOfferItems }) => {
   );
 };
 
-export async function getStaticProps()  {
-  const fetchOfferItems = async () => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    try {
-      const promises = categories.map(async (category) => {
-        const res = await fetch(`${baseUrl}/api/offerItems?type=${category.foodType}`);
-        if (!res.ok) {
-          throw new Error(`Failed to fetch offer items for ${category.foodType}`);
-        }
-        const data = await res.json();
-        return { [category.foodType]: data };
-      });
-      const results = await Promise.all(promises);
-      return results.reduce((acc, result) => ({ ...acc, ...result }), {});
-    } catch (error) {
-      console.error('Error fetching offer items:', error);
-      throw new Error('Failed to fetch offer items');
-    }
-  };
 
-  try {
-    const offerItems = await fetchOfferItems();
-
-    return {
-      props: {
-        initialOfferItems: offerItems,
-      },
-      
-    };
-  } catch (error) {
-    console.error('Error fetching offer items:', error);
-    return {
-      props: {
-        initialOfferItems: {},
-      },
-    };
-  }
-};
 
 
 

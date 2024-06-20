@@ -59,7 +59,7 @@ export default async function handler(req, res) {
     // Check if required query parameter is provided
     if (!name) {
       return res.status(400).json({ error: 'Name is required' });
-    }
+    } 
   
     try {
       const result = await sql`
@@ -70,6 +70,6 @@ export default async function handler(req, res) {
     } catch (error) {
       console.error('Error deleting menu item:', error);
       res.status(500).json({ error: 'Internal Server Error' });
-    }
+    } 
 }
 }
