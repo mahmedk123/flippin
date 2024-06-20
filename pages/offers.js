@@ -14,30 +14,28 @@ import {
   VStack,
   Text,
   HStack,
-  useBreakpointValue,
   Image,
 } from '@chakra-ui/react';
 
 const categories = [
-  { label: 'Offers', type: 'offers' }
+  { label: 'Offers', type: 'offers' },
 ];
 
 export async function getStaticProps() {
   const fetchOfferData = async (type) => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-      const res = await fetch(`${baseUrl}/api/offerItems?type=${type}`); // Ensure correct endpoint name and query parameter
+      const res = await fetch(`${baseUrl}/api/menuItem?type=${type}`);
       if (!res.ok) {
-        throw new Error(`Failed to fetch offer data for ${type}`);
+        throw new Error(`Failed to fetch menu data for ${type}`);
       }
       const data = await res.json();
       return data.length > 0 ? data : null;
     } catch (error) {
-      console.error(`Error fetching offer data for ${type}:`, error);
+      console.error(`Error fetching menu data for ${type}:`, error);
       return null;
     }
   };
-  
 
   const offerItems = {};
   for (const category of categories) {
@@ -60,11 +58,11 @@ export async function getStaticProps() {
   };
 }
 
-const OffersPage = ({ initialOfferItems }) => {
+const OfferPage = ({ initialOfferItems }) => {
   const [offerItemsCache, setOfferItemsCache] = useState(initialOfferItems);
   const { isSignedIn } = useUser();
   const [formData, setFormData] = useState({ name: '', price: '', description: '' });
-
+  
   const handleDelete = async (type, name) => {
     const encodedName = encodeURIComponent(name);
     const isConfirmed = window.confirm('Are you sure you want to delete this item?');
@@ -72,13 +70,13 @@ const OffersPage = ({ initialOfferItems }) => {
       return;
     }
     try {
-      const res = await fetch(`/api/offerItems?type=${type}&name=${encodedName}`, {
+      const res = await fetch(`/api/menuItem?type=${type}&name=${encodedName}`, {
         method: 'DELETE',
       });
       if (!res.ok) {
-        throw new Error('Failed to delete offer item');
+        throw new Error('Failed to delete menu item');
       }
-      console.log('Offer item deleted successfully');
+      console.log('Menu item deleted successfully');
       setOfferItemsCache((prev) => {
         const filteredItems = prev[type].filter(item => item.foodname !== name);
         return {
@@ -87,23 +85,22 @@ const OffersPage = ({ initialOfferItems }) => {
         };
       });
     } catch (error) {
-      console.error('Error deleting offer item:', error);
+      console.error('Error deleting menu item:', error);
     }
   };
-  
 
   const fetchOfferData = async (type) => {
     try {
-      const res = await fetch(`/api/offerItems?type=${type}`);
+      const res = await fetch(`/api/menuItem?type=${type}`);
       if (!res.ok) {
-        throw new Error('Failed to fetch offer data');
+        throw new Error('Failed to fetch menu data');
       }
       const data = await res.json();
       if (data.length > 0) {
         setOfferItemsCache((prev) => ({ ...prev, [type]: data }));
       }
     } catch (error) {
-      console.error(`Error fetching offer data for ${type}:`, error);
+      console.error(`Error fetching menu data for ${type}:`, error);
       setOfferItemsCache((prev) => ({ ...prev, [type]: [] }));
     }
   };
@@ -124,22 +121,18 @@ const OffersPage = ({ initialOfferItems }) => {
       price: formData.price,
       description: formData.description,
       imageURL: formData.imageURL,
-      type: type, // Ensure you include the type in the payload if necessary
     };
-  
     try {
-      const res = await fetch(`/api/offerItems`, {
+      const res = await fetch(`/api/menuItem?type=${type}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(newItem),
       });
-  
       if (!res.ok) {
-        throw new Error(`Failed to add new offer item: ${res.statusText}`);
+        throw new Error(`Failed to add new menu item: ${res.statusText}`);
       }
-  
       const responseData = await res.json();
       setOfferItemsCache((prev) => ({
         ...prev,
@@ -147,10 +140,9 @@ const OffersPage = ({ initialOfferItems }) => {
       }));
       setFormData({ name: '', price: '', description: '', imageURL: '' });
     } catch (error) {
-      console.error('Error adding new offer item:', error);
+      console.error('Error adding new menu item:', error);
     }
   };
-  
   
   
  
@@ -187,7 +179,6 @@ const OffersPage = ({ initialOfferItems }) => {
       console.error('Error uploading image:', error);
     }
   };
-  const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
     <Container maxW="container.xl" minH="100vh" position="relative" pb="40px">
@@ -208,7 +199,7 @@ const OffersPage = ({ initialOfferItems }) => {
           scrollbarWidth: 'none',
         }}
       >
-        {categories.map(({ label, type }) => (
+        {/* {categories.map(({ label, type }) => (
           <Button
             key={type}
             onClick={() => document.getElementById(type).scrollIntoView({ behavior: 'smooth' })}
@@ -217,7 +208,7 @@ const OffersPage = ({ initialOfferItems }) => {
           >
             {label}
           </Button>
-        ))}
+        ))} */}
       </HStack>
       {categories.map(({ label, type }) => (
         <Box key={type} my="12" id={type}>
@@ -340,4 +331,4 @@ const OffersPage = ({ initialOfferItems }) => {
   );
 };
 
-export default OffersPage;
+export default OfferPage;
