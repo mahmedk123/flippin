@@ -12,7 +12,7 @@ export default function Home({ isMobile }) {
         <Head>
           <title>Flippin</title>
           <meta name="description" content="Best restaurant in town" />
-          <link rel="icon" href="/favicon.ico" />
+          <link rel="icon" href="/flippin-white.svg" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         </Head>
         <div className="content">
