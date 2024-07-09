@@ -61,7 +61,7 @@ export async function getStaticProps() {
 const OfferPage = ({ initialOfferItems }) => {
   const [offerItemsCache, setOfferItemsCache] = useState(initialOfferItems);
   const { isSignedIn } = useUser();
-  const [formData, setFormData] = useState({ name: '', price: '', description: '' });
+  const [formData, setFormData] = useState({ name: '', price: '', description: '', imageURL: '' });
   
   const handleDelete = async (type, name) => {
     const encodedName = encodeURIComponent(name);
@@ -144,8 +144,6 @@ const OfferPage = ({ initialOfferItems }) => {
     }
   };
   
-  
- 
   const handleImageUpload = async (event) => {
     if (!event.target.files || event.target.files.length === 0) {
       console.error('No file selected.');
@@ -216,51 +214,55 @@ const OfferPage = ({ initialOfferItems }) => {
             {label}
           </Heading>
           <VStack spacing="4" align="start">
-          {(offerItemsCache[type] || []).map((item, index) => (
-              <Box
-                key={index}
-                p="2"
-                borderWidth="3px"
-                borderRadius="xl"
-                w={{ base: '100%', md: '75%', lg: '50%' }}
-                margin="auto"
-                mt="4"
-                boxShadow="md"
-                textAlign="center"
-              >
-                <Text fontWeight="bold" fontSize="xl">
-                  {item.foodname}
-                </Text>
-                <Box mt="2">
-                  <Text>{item.description}</Text>
-                </Box>
-                <Flex justifyContent="center" alignItems="center" mt="2">
-                  <Text alignSelf="flex-start">{item.description ? 'on its own' : ''}</Text>
-                  <Box ml="2">£{item.foodprice}</Box>
-                </Flex>
-                <Flex justifyContent="center" alignItems="center" mt="2">
-                  {item.imageurl && (
-                    <Image
-                      src={item.imageurl}
-                      alt={item.foodname}
-                      boxSize="200px"
-                      objectFit="cover"
-                      onError={(e) => {
-                        console.error('Error loading image:', e);
-                        // Optionally, you can display a placeholder image or fallback content here
-                      }}
-                    />
-                  )}
-                </Flex>
-                {isSignedIn && (
-                  <Flex mt="2" justifyContent="flex-end">
-                    <Button colorScheme="red" onClick={() => handleDelete(type, item.foodname)}>
-                      Delete
-                    </Button>
+            {offerItemsCache[type] && offerItemsCache[type].length > 0 ? (
+              offerItemsCache[type].map((item, index) => (
+                <Box
+                  key={index}
+                  p="2"
+                  borderWidth="3px"
+                  borderRadius="xl"
+                  w={{ base: '100%', md: '75%', lg: '50%' }}
+                  margin="auto"
+                  mt="4"
+                  boxShadow="md"
+                  textAlign="center"
+                >
+                  <Text fontWeight="bold" fontSize="xl">
+                    {item.foodname}
+                  </Text>
+                  <Box mt="2">
+                    <Text>{item.description}</Text>
+                  </Box>
+                  <Flex justifyContent="center" alignItems="center" mt="2">
+                    <Text alignSelf="flex-start">{item.description ? 'on its own' : ''}</Text>
+                    <Box ml="2">£{item.foodprice}</Box>
                   </Flex>
-                )}
-              </Box>
-            ))}
+                  <Flex justifyContent="center" alignItems="center" mt="2">
+                    {item.imageurl && (
+                      <Image
+                        src={item.imageurl}
+                        alt={item.foodname}
+                        boxSize="200px"
+                        objectFit="cover"
+                        onError={(e) => {
+                          console.error('Error loading image:', e);
+                          // Optionally, you can display a placeholder image or fallback content here
+                        }}
+                      />
+                    )}
+                  </Flex>
+                  {isSignedIn && (
+                    <Flex mt="2" justifyContent="flex-end">
+                      <Button colorScheme="red" onClick={() => handleDelete(type, item.foodname)}>
+                        Delete
+                      </Button>
+                    </Flex>
+                  )}
+                </Box>
+              ))
+            ) : (
+              <Text>There's no offers at the moment. Please check again later!</Text>
+            )}
           </VStack>
           {isSignedIn && (
             <Box as="form" onSubmit={(e) => handleSubmit(e, type)} mt="4">
@@ -310,23 +312,7 @@ const OfferPage = ({ initialOfferItems }) => {
           )}
         </Box>
       ))}
-      <Box
-        as="footer"
-        position="absolute"
-        bottom="0"
-        left="0"
-        width="100%"
-        bg="black"
-        p="4"
-        textAlign="center"
-        borderTop="2px"
-        borderColor="black"
-        color="white"
-      >
-        <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold">
-          UPGRADE TO A MEAL +£1.50
-        </Text>
-      </Box>
+      
     </Container>
   );
 };
