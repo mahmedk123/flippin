@@ -261,7 +261,7 @@ const OfferPage = ({ initialOfferItems }) => {
                 </Box>
               ))
             ) : (
-              <Text>There's no offers at the moment. Please check again later!</Text>
+              <Text>There&apos;s no offers at the moment. Please check again later!</Text>
             )}
           </VStack>
           {isSignedIn && (
